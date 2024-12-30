@@ -1,0 +1,16 @@
+{
+  "name": "My Job Tracker",
+  "description": "A simple Chrome extension to track job applications.",
+  "version": "1.0",
+  "manifest_version": 3,
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "permissions": [
+    "storage"
+  ],
+  "web_accessible_resources": [{
+    "resources": ["style.css"],
+    "matches": ["<all_urls>"]
+  }]
+}

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Job Tracker</title>
+
+    <!-- Use a modern Google Font -->
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600,700&display=swap"
+    />
+
+    <!-- Link your custom CSS -->
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- Card Container -->
+    <div class="card">
+      <h1 class="title">Track Your Job</h1>
+      <form id="job-form">
+        <div class="form-group">
+          <label for="dashboardName">Dashboard Name</label>
+          <input
+            type="text"
+            id="dashboardName"
+            placeholder="e.g. Tech Applications"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="company">Company</label>
+          <input type="text" id="company" placeholder="e.g. Google" required />
+        </div>
+
+        <div class="form-group">
+          <label for="position">Position</label>
+          <input
+            type="text"
+            id="position"
+            placeholder="e.g. Frontend Engineer"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="location">Location</label>
+          <input
+            type="text"
+            id="location"
+            placeholder="e.g. San Francisco"
+            required
+          />
+        </div>
+
+        <div class="form-group checkbox-group">
+          <label for="applied" class="checkbox-label">Applied?</label>
+          <input type="checkbox" id="applied" />
+        </div>
+
+        <div class="form-group">
+          <label for="url">Job URL</label>
+          <input
+            type="url"
+            id="url"
+            placeholder="https://example.com/job-post"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="salaryRange">Salary Range</label>
+          <input type="text" id="salaryRange" placeholder="$80k - $100k" />
+        </div>
+
+        <button type="submit" class="btn-primary">Save</button>
+      </form>
+    </div>
+
+    <script src="popup.js"></script>
+  </body>
+</html>
