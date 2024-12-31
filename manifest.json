@@ -4,13 +4,44 @@
   "version": "1.0",
   "manifest_version": 3,
   "action": {
-    "default_popup": "popup.html"
+    "default_popup": "src/popup/popup.html"
   },
   "permissions": [
-    "storage"
+    "storage",
+    "activeTab",
+    "scripting",
+    "identity"
+  ],
+  "host_permissions": [
+    "*://*.github.com/*",
+    "http://localhost:8080/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.linkedin.com/jobs/*",
+        "*://*.indeed.com/*",
+        "*://*.glassdoor.com/job-listing/*",
+        "*://*.greenhouse.io/*/jobs/*"
+      ],
+      "js": [
+        "src/content/utils/utils.js",
+        "src/content/sites/base.js",
+        "src/content/sites/linkedin.js",
+        "src/content/contentScript.js"
+      ],
+      "css": ["src/content/styles/contentStyle.css"]
+    }
   ],
   "web_accessible_resources": [{
-    "resources": ["style.css"],
+    "resources": ["src/popup/styles/style.css"],
     "matches": ["<all_urls>"]
-  }]
+  }],
+  "oauth2": {
+    "client_id": "YOUR_GITHUB_CLIENT_ID",
+    "scopes": ["user:email"]
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+  }
 }

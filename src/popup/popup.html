@@ -12,7 +12,7 @@
     />
 
     <!-- Link your custom CSS -->
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="styles/style.css" />
   </head>
   <body>
     <!-- Card Container -->
@@ -20,13 +20,13 @@
       <h1 class="title">Track Your Job</h1>
       <form id="job-form">
         <div class="form-group">
-          <label for="dashboardName">Dashboard Name</label>
-          <input
-            type="text"
-            id="dashboardName"
-            placeholder="e.g. Tech Applications"
-            required
-          />
+          <label for="dashboardName">Select Dashboard</label>
+          <select id="dashboardName" required>
+            <option value="" disabled selected>Choose a dashboard...</option>
+          </select>
+          <button type="button" id="createDashboard" class="btn-secondary">
+            Create New Dashboard
+          </button>
         </div>
 
         <div class="form-group">
@@ -54,9 +54,13 @@
           />
         </div>
 
-        <div class="form-group checkbox-group">
-          <label for="applied" class="checkbox-label">Applied?</label>
-          <input type="checkbox" id="applied" />
+        <div class="form-group">
+          <label for="jobDescription">Job Description</label>
+          <textarea
+            id="jobDescription"
+            rows="6"
+            placeholder="Job description and requirements"
+          ></textarea>
         </div>
 
         <div class="form-group">
@@ -77,6 +81,27 @@
       </form>
     </div>
 
-    <script src="popup.js"></script>
+    <div id="createDashboardModal" class="modal">
+      <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <h2>Create New Dashboard</h2>
+        <form id="dashboard-form">
+          <div class="form-group">
+            <label for="newDashboardName">Dashboard Name</label>
+            <input
+              type="text"
+              id="newDashboardName"
+              placeholder="e.g. Tech Applications 2024"
+              required
+            />
+          </div>
+          <button type="submit" class="btn-primary">Create Dashboard</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../services/auth.js"></script>
+    <script type="module" src="popup.js"></script>
   </body>
 </html>
