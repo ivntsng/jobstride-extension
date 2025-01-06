@@ -4,26 +4,71 @@ window.AUTH_CONFIG = {
 
 window.Auth = {
   checkAuthStatus: async function () {
-    const token = await chrome.storage.local.get("token");
-    return !!token.token;
+    try {
+      // First check chrome.storage
+      const chromeToken = await chrome.storage.local.get("token");
+      if (chromeToken.token) return true;
+
+      // Then check localStorage from the main web app
+      // We need to execute this in the context of the web app
+      const result = await chrome.tabs.query({
+        active: true,
+        currentWindow: true,
+      });
+      if (result[0]?.url.includes("localhost:5173")) {
+        const [tab] = result;
+        const token = await chrome.scripting.executeScript({
+          target: { tabId: tab.id },
+          func: () => localStorage.getItem("token"),
+        });
+
+        if (token[0]?.result) {
+          // If found in localStorage, save to chrome.storage
+          await chrome.storage.local.set({ token: token[0].result });
+          return true;
+        }
+      }
+
+      return false;
+    } catch (error) {
+      console.error("Error checking auth status:", error);
+      return false;
+    }
   },
 
   getUserDashboards: async function () {
-    const { token } = await chrome.storage.local.get("token");
-    if (!token) return null;
-
     try {
-      const response = await fetch(
-        `${window.AUTH_CONFIG.apiBaseUrl}/api/dashboards`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const chromeToken = await chrome.storage.local.get("token");
+      console.log("Retrieved token:", chromeToken.token ? "exists" : "missing");
 
-      if (!response.ok) throw new Error("Failed to fetch dashboards");
-      return await response.json();
+      if (!chromeToken.token) {
+        return null;
+      }
+
+      const url = `${window.AUTH_CONFIG.apiBaseUrl}/dashboards/`;
+      console.log("Fetching dashboards from:", url);
+
+      const response = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${chromeToken.token}`,
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        mode: "cors",
+      });
+
+      if (!response.ok) {
+        console.error("Response status:", response.status);
+        const errorText = await response.text();
+        console.error("Response text:", errorText);
+        throw new Error(
+          `Failed to fetch dashboards: ${response.status} ${errorText}`
+        );
+      }
+
+      const data = await response.json();
+      console.log("Dashboards data:", data);
+      return data;
     } catch (error) {
       console.error("Error fetching dashboards:", error);
       return null;
@@ -45,19 +90,11 @@ window.Auth = {
       const { client_id } = await response.json();
 
       // Open GitHub login in a new window/tab
-      const width = 600;
-      const height = 800;
-      const left = screen.width / 2 - width / 2;
-      const top = screen.height / 2 - height / 2;
 
       const authUrl = `https://github.com/login/oauth/authorize?client_id=${client_id}&redirect_uri=http://localhost:5173/auth/callback&scope=user:email`;
 
       return new Promise((resolve, reject) => {
-        const authWindow = window.open(
-          authUrl,
-          "GitHub Auth",
-          `width=${width},height=${height},left=${left},top=${top}`
-        );
+        const authWindow = window.open(authUrl, "GitHub Auth");
 
         // Listen for messages from the auth window
         window.addEventListener("message", async (event) => {

@@ -8,8 +8,13 @@ function createModalForm() {
       <h2>Track This Job</h2>
       <form id="job-form-modal">
         <div class="form-group">
-          <label for="dashboardName">Dashboard Name</label>
-          <input type="text" id="dashboardName" placeholder="e.g. Tech Applications" required />
+          <label for="dashboardName">Select Dashboard</label>
+          <select id="dashboardName" required>
+            <option value="" disabled selected>Choose a dashboard...</option>
+          </select>
+          <button type="button" id="createDashboard" class="btn-secondary">
+            Create New Dashboard
+          </button>
         </div>
         <div class="form-group">
           <label for="company">Company</label>
@@ -38,9 +43,168 @@ function createModalForm() {
         <button type="submit" class="btn-primary">Save</button>
       </form>
     </div>
+
+    <div id="createDashboardModal" class="modal">
+      <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <h2>Create New Dashboard</h2>
+        <form id="dashboard-form">
+          <div class="form-group">
+            <label for="newDashboardName">Dashboard Name</label>
+            <input
+              type="text"
+              id="newDashboardName"
+              placeholder="e.g. Tech Applications 2024"
+              required
+            />
+          </div>
+          <button type="submit" class="btn-primary">Create Dashboard</button>
+        </form>
+      </div>
+    </div>
   `;
   document.body.appendChild(modal);
+
+  // Add the authentication and dashboard functionality
+  initializeModalFunctionality(modal);
+
   return modal;
+}
+
+function initializeModalFunctionality(modal) {
+  const form = modal.querySelector("#job-form-modal");
+  const dashboardSelect = modal.querySelector("#dashboardName");
+
+  // Show loading state while fetching dashboards
+  dashboardSelect.innerHTML =
+    '<option value="" disabled selected>Loading dashboards...</option>';
+
+  // Fetch and populate dashboards using Auth service
+  (async () => {
+    try {
+      const dashboards = await window.Auth.getUserDashboards();
+      console.log("Received dashboards:", dashboards);
+
+      if (dashboards?.length) {
+        dashboardSelect.innerHTML = dashboards
+          .map((d) => `<option value="${d.id}">${d.name}</option>`)
+          .join("");
+      } else {
+        console.log("No dashboards found or dashboards is null");
+        dashboardSelect.innerHTML =
+          '<option value="" disabled selected>No dashboards found</option>';
+      }
+    } catch (error) {
+      console.error("Error fetching dashboards:", error);
+      dashboardSelect.innerHTML =
+        '<option value="" disabled selected>Error loading dashboards</option>';
+    }
+  })();
+
+  // Handle form submission
+  form.addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    const token = (await chrome.storage.local.get("token")).token;
+    if (!token) {
+      alert("Please login first");
+      return;
+    }
+
+    const jobData = {
+      dashboard_id: document.getElementById("dashboardName").value.trim(),
+      company: document.getElementById("company").value.trim(),
+      position: document.getElementById("position").value.trim(),
+      location: document.getElementById("location").value.trim(),
+      url: document.getElementById("url").value.trim(),
+      salary_range: document.getElementById("salaryRange").value.trim(),
+      job_description: document.getElementById("jobDescription").value.trim(),
+      status: "saved",
+      applied_date: new Date().toISOString(),
+    };
+
+    try {
+      const response = await fetch(`${window.AUTH_CONFIG.apiBaseUrl}/jobs`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        credentials: "include",
+        mode: "cors",
+        body: JSON.stringify(jobData),
+      });
+
+      if (!response.ok) throw new Error("Failed to save job");
+
+      const savedJob = await response.json();
+      console.log("Job saved successfully:", savedJob);
+      alert("Job info saved successfully!");
+      modal.style.display = "none";
+    } catch (error) {
+      console.error("Error saving job:", error);
+      alert("Failed to save job. Please try again.");
+    }
+  });
+
+  // Handle dashboard creation modal
+  const createDashboardBtn = modal.querySelector("#createDashboard");
+  const dashboardModal = modal.querySelector("#createDashboardModal");
+  const closeModal = dashboardModal.querySelector(".close-modal");
+  const dashboardForm = modal.querySelector("#dashboard-form");
+
+  createDashboardBtn.addEventListener("click", () => {
+    dashboardModal.style.display = "block";
+  });
+
+  closeModal.addEventListener("click", () => {
+    dashboardModal.style.display = "none";
+  });
+
+  window.addEventListener("click", (event) => {
+    if (event.target === dashboardModal) {
+      dashboardModal.style.display = "none";
+    }
+  });
+
+  // Handle dashboard creation
+  dashboardForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const newDashboardName = modal
+      .querySelector("#newDashboardName")
+      .value.trim();
+
+    try {
+      const token = (await chrome.storage.local.get("token")).token;
+      const response = await fetch(
+        `${window.AUTH_CONFIG.apiBaseUrl}/api/dashboards`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ name: newDashboardName }),
+        }
+      );
+
+      if (!response.ok) throw new Error("Failed to create dashboard");
+
+      const newDashboard = await response.json();
+
+      // Add new dashboard to select element
+      const option = new Option(newDashboard.name, newDashboard.id);
+      dashboardSelect.add(option);
+      dashboardSelect.value = newDashboard.id;
+
+      // Close modal and reset form
+      dashboardModal.style.display = "none";
+      dashboardForm.reset();
+    } catch (error) {
+      console.error("Error creating dashboard:", error);
+      alert("Failed to create dashboard. Please try again.");
+    }
+  });
 }
 
 // Utils

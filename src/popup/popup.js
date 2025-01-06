@@ -36,12 +36,14 @@ document.addEventListener("DOMContentLoaded", async function () {
   // Fetch and populate dashboards
   try {
     const dashboards = await window.Auth.getUserDashboards();
+    console.log("Received dashboards:", dashboards);
     if (dashboards?.length) {
       dashboardSelect.innerHTML = dashboards
         .map((d) => `<option value="${d.id}">${d.name}</option>`)
         .join("");
       form.style.display = "block";
     } else {
+      console.log("No dashboards found or dashboards is null");
       dashboardSelect.innerHTML =
         '<option value="" disabled selected>No dashboards found</option>';
     }
@@ -55,48 +57,42 @@ document.addEventListener("DOMContentLoaded", async function () {
     e.preventDefault();
 
     // Gather form data
-    const dashboardId = document.getElementById("dashboardName").value.trim();
-    const company = document.getElementById("company").value.trim();
-    const position = document.getElementById("position").value.trim();
-    const location = document.getElementById("location").value.trim();
-    const url = document.getElementById("url").value.trim();
-    const salaryRange = document.getElementById("salaryRange").value.trim();
-    const jobDescription = document
-      .getElementById("jobDescription")
-      .value.trim();
-
-    // Create a job object
     const jobData = {
-      dashboardId,
-      company,
-      position,
-      location,
-      url,
-      salaryRange,
-      jobDescription,
-      createdAt: new Date().toISOString(),
+      dashboard_id: document.getElementById("dashboardName").value.trim(),
+      company: document.getElementById("company").value.trim(),
+      position: document.getElementById("position").value.trim(),
+      location: document.getElementById("location").value.trim(),
+      url: document.getElementById("url").value.trim(),
+      salary_range: document.getElementById("salaryRange").value.trim(),
+      job_description: document.getElementById("jobDescription").value.trim(),
+      status: "saved",
+      applied_date: new Date().toISOString(),
     };
 
     try {
-      const response = await fetch(
-        `${window.AUTH_CONFIG.apiBaseUrl}/api/jobs`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${
-              (
-                await chrome.storage.local.get("token")
-              ).token
-            }`,
-          },
-          body: JSON.stringify(jobData),
-        }
-      );
+      const response = await fetch(`${window.AUTH_CONFIG.apiBaseUrl}/jobs`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${
+            (
+              await chrome.storage.local.get("token")
+            ).token
+          }`,
+        },
+        credentials: "include",
+        mode: "cors",
+        body: JSON.stringify(jobData),
+      });
 
-      if (!response.ok) throw new Error("Failed to save job");
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Error response:", errorText);
+        throw new Error("Failed to save job");
+      }
 
-      console.log("Job data saved:", jobData);
+      const savedJob = await response.json();
+      console.log("Job saved successfully:", savedJob);
       alert("Job info saved successfully!");
       form.reset();
     } catch (error) {
@@ -135,7 +131,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     try {
       const response = await fetch(
-        `${window.AUTH_CONFIG.apiBaseUrl}/api/dashboards`,
+        `${window.AUTH_CONFIG.apiBaseUrl}/dashboards/`,
         {
           method: "POST",
           headers: {

@@ -9,11 +9,9 @@
   "permissions": [
     "storage",
     "activeTab",
-    "scripting",
-    "identity"
+    "scripting"
   ],
   "host_permissions": [
-    "*://*.github.com/*",
     "http://localhost:8080/*"
   ],
   "content_scripts": [
