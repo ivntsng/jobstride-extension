@@ -9,10 +9,12 @@
   "permissions": [
     "storage",
     "activeTab",
-    "scripting"
+    "scripting",
+    "webRequest"
   ],
   "host_permissions": [
-    "http://localhost:8080/*"
+    "http://localhost:8080/*",
+    "https://localhost:8080/*"
   ],
   "content_scripts": [
     {
@@ -23,12 +25,14 @@
         "*://*.greenhouse.io/*/jobs/*"
       ],
       "js": [
+        "src/services/auth.js",
         "src/content/utils/utils.js",
         "src/content/sites/base.js",
         "src/content/sites/linkedin.js",
         "src/content/contentScript.js"
       ],
-      "css": ["src/content/styles/contentStyle.css"]
+      "css": ["src/content/styles/contentStyle.css"],
+      "run_at": "document_end"
     }
   ],
   "web_accessible_resources": [{
@@ -41,5 +45,8 @@
   },
   "content_security_policy": {
     "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+  },
+  "background": {
+    "service_worker": "src/background/background.js"
   }
 }

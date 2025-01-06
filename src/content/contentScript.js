@@ -1,3 +1,22 @@
+window.AUTH_CONFIG = {
+  apiBaseUrl: "http://localhost:8080", // Replace with your actual API URL
+};
+
+let currentToken = null;
+
+// Listen for auth state changes
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.type === "AUTH_STATE_CHANGED") {
+    currentToken = message.token;
+    // Refresh dashboards if modal is open
+    if (document.getElementById("job-tracker-modal")) {
+      initializeModalFunctionality(
+        document.getElementById("job-tracker-modal")
+      );
+    }
+  }
+});
+
 // Modal functionality
 function createModalForm() {
   const modal = document.createElement("div");
@@ -12,9 +31,6 @@ function createModalForm() {
           <select id="dashboardName" required>
             <option value="" disabled selected>Choose a dashboard...</option>
           </select>
-          <button type="button" id="createDashboard" class="btn-secondary">
-            Create New Dashboard
-          </button>
         </div>
         <div class="form-group">
           <label for="company">Company</label>
@@ -43,25 +59,6 @@ function createModalForm() {
         <button type="submit" class="btn-primary">Save</button>
       </form>
     </div>
-
-    <div id="createDashboardModal" class="modal">
-      <div class="modal-content">
-        <span class="close-modal">&times;</span>
-        <h2>Create New Dashboard</h2>
-        <form id="dashboard-form">
-          <div class="form-group">
-            <label for="newDashboardName">Dashboard Name</label>
-            <input
-              type="text"
-              id="newDashboardName"
-              placeholder="e.g. Tech Applications 2024"
-              required
-            />
-          </div>
-          <button type="submit" class="btn-primary">Create Dashboard</button>
-        </form>
-      </div>
-    </div>
   `;
   document.body.appendChild(modal);
 
@@ -71,7 +68,7 @@ function createModalForm() {
   return modal;
 }
 
-function initializeModalFunctionality(modal) {
+async function initializeModalFunctionality(modal) {
   const form = modal.querySelector("#job-form-modal");
   const dashboardSelect = modal.querySelector("#dashboardName");
 
@@ -79,27 +76,23 @@ function initializeModalFunctionality(modal) {
   dashboardSelect.innerHTML =
     '<option value="" disabled selected>Loading dashboards...</option>';
 
-  // Fetch and populate dashboards using Auth service
-  (async () => {
-    try {
-      const dashboards = await window.Auth.getUserDashboards();
-      console.log("Received dashboards:", dashboards);
+  try {
+    // Use the existing Auth service instead of direct fetch
+    const dashboards = await window.Auth.getUserDashboards();
 
-      if (dashboards?.length) {
-        dashboardSelect.innerHTML = dashboards
-          .map((d) => `<option value="${d.id}">${d.name}</option>`)
-          .join("");
-      } else {
-        console.log("No dashboards found or dashboards is null");
-        dashboardSelect.innerHTML =
-          '<option value="" disabled selected>No dashboards found</option>';
-      }
-    } catch (error) {
-      console.error("Error fetching dashboards:", error);
+    if (dashboards?.length) {
+      dashboardSelect.innerHTML = dashboards
+        .map((d) => `<option value="${d.id}">${d.name}</option>`)
+        .join("");
+    } else {
       dashboardSelect.innerHTML =
-        '<option value="" disabled selected>Error loading dashboards</option>';
+        '<option value="" disabled selected>No dashboards found</option>';
     }
-  })();
+  } catch (error) {
+    console.error("Error fetching dashboards:", error);
+    dashboardSelect.innerHTML =
+      '<option value="" disabled selected>Error loading dashboards</option>';
+  }
 
   // Handle form submission
   form.addEventListener("submit", async function (e) {
@@ -124,85 +117,29 @@ function initializeModalFunctionality(modal) {
     };
 
     try {
-      const response = await fetch(`${window.AUTH_CONFIG.apiBaseUrl}/jobs`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        credentials: "include",
-        mode: "cors",
-        body: JSON.stringify(jobData),
-      });
-
-      if (!response.ok) throw new Error("Failed to save job");
-
-      const savedJob = await response.json();
-      console.log("Job saved successfully:", savedJob);
-      alert("Job info saved successfully!");
-      modal.style.display = "none";
-    } catch (error) {
-      console.error("Error saving job:", error);
-      alert("Failed to save job. Please try again.");
-    }
-  });
-
-  // Handle dashboard creation modal
-  const createDashboardBtn = modal.querySelector("#createDashboard");
-  const dashboardModal = modal.querySelector("#createDashboardModal");
-  const closeModal = dashboardModal.querySelector(".close-modal");
-  const dashboardForm = modal.querySelector("#dashboard-form");
-
-  createDashboardBtn.addEventListener("click", () => {
-    dashboardModal.style.display = "block";
-  });
-
-  closeModal.addEventListener("click", () => {
-    dashboardModal.style.display = "none";
-  });
-
-  window.addEventListener("click", (event) => {
-    if (event.target === dashboardModal) {
-      dashboardModal.style.display = "none";
-    }
-  });
-
-  // Handle dashboard creation
-  dashboardForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const newDashboardName = modal
-      .querySelector("#newDashboardName")
-      .value.trim();
-
-    try {
-      const token = (await chrome.storage.local.get("token")).token;
-      const response = await fetch(
-        `${window.AUTH_CONFIG.apiBaseUrl}/api/dashboards`,
-        {
+      const response = await chrome.runtime.sendMessage({
+        type: "FETCH_REQUEST",
+        config: {
+          url: `${window.AUTH_CONFIG.apiBaseUrl}/jobs`,
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ name: newDashboardName }),
-        }
-      );
+          body: JSON.stringify(jobData),
+        },
+      });
 
-      if (!response.ok) throw new Error("Failed to create dashboard");
+      if (!response.success) {
+        throw new Error(response.error || "Failed to save job");
+      }
 
-      const newDashboard = await response.json();
-
-      // Add new dashboard to select element
-      const option = new Option(newDashboard.name, newDashboard.id);
-      dashboardSelect.add(option);
-      dashboardSelect.value = newDashboard.id;
-
-      // Close modal and reset form
-      dashboardModal.style.display = "none";
-      dashboardForm.reset();
+      console.log("Job saved successfully:", response.data);
+      alert("Job info saved successfully!");
+      modal.style.display = "none";
     } catch (error) {
-      console.error("Error creating dashboard:", error);
-      alert("Failed to create dashboard. Please try again.");
+      console.error("Error saving job:", error);
+      alert("Failed to save job. Please try again.");
     }
   });
 }

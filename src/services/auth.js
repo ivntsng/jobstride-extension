@@ -45,33 +45,37 @@ window.Auth = {
         return null;
       }
 
-      const url = `${window.AUTH_CONFIG.apiBaseUrl}/dashboards/`;
-      console.log("Fetching dashboards from:", url);
-
-      const response = await fetch(url, {
-        headers: {
-          Authorization: `Bearer ${chromeToken.token}`,
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        mode: "cors",
-      });
-
-      if (!response.ok) {
-        console.error("Response status:", response.status);
-        const errorText = await response.text();
-        console.error("Response text:", errorText);
-        throw new Error(
-          `Failed to fetch dashboards: ${response.status} ${errorText}`
+      return new Promise((resolve, reject) => {
+        chrome.runtime.sendMessage(
+          {
+            type: "FETCH_REQUEST",
+            config: {
+              url: `${window.AUTH_CONFIG.apiBaseUrl}/dashboards/`,
+              method: "GET",
+              headers: {
+                Authorization: `Bearer ${chromeToken.token}`,
+                "Content-Type": "application/json",
+                Accept: "application/json",
+              },
+            },
+          },
+          (response) => {
+            if (chrome.runtime.lastError) {
+              console.error("Runtime error:", chrome.runtime.lastError);
+              reject(chrome.runtime.lastError);
+            } else if (!response || !response.success) {
+              reject(
+                new Error(response?.error || "Failed to fetch dashboards")
+              );
+            } else {
+              resolve(response.data);
+            }
+          }
         );
-      }
-
-      const data = await response.json();
-      console.log("Dashboards data:", data);
-      return data;
+      });
     } catch (error) {
       console.error("Error fetching dashboards:", error);
-      return null;
+      return [];
     }
   },
 
