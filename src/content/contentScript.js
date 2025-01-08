@@ -5,7 +5,7 @@ window.AUTH_CONFIG = {
 let currentToken = null;
 
 // Listen for auth state changes
-chrome.runtime.onMessage.addListener((message) => {
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "AUTH_STATE_CHANGED") {
     currentToken = message.token;
     // Refresh dashboards if modal is open
