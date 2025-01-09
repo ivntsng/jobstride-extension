@@ -158,11 +158,24 @@ function convertHtmlToMarkdown(html) {
     // Remove any script tags and their contents
     .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
     // Remove SVG elements
-    .replace(/<svg\b[^<]*(?:(?!<\/svg>)<[^<]*)*<\/svg>/gi, "");
+    .replace(/<svg\b[^<]*(?:(?!<\/svg>)<[^<]*)*<\/svg>/gi, "")
+    // Remove HTML comments
+    .replace(/<!--.*?-->/g, "")
+    // Remove extra spaces before/after tags
+    .replace(/\s*<([^>]*)>\s*/g, "<$1>");
 
   // Create a temporary div to handle HTML content
   const tempDiv = document.createElement("div");
   tempDiv.innerHTML = cleanHtml;
+
+  // Convert bullet points before getting text content
+  const bulletLists = tempDiv.querySelectorAll("ul");
+  bulletLists.forEach((ul) => {
+    const items = ul.querySelectorAll("li");
+    items.forEach((li) => {
+      li.textContent = `• ${li.textContent.trim()}`;
+    });
+  });
 
   // Get the text content
   let text = tempDiv.textContent || tempDiv.innerText;
@@ -172,11 +185,21 @@ function convertHtmlToMarkdown(html) {
     text
       // Replace multiple spaces with a single space
       .replace(/\s+/g, " ")
+      // Preserve URLs by temporarily replacing dots in them
+      .replace(/(https?:\/\/[^\s]+)/gi, (url) => url.replace(/\./g, "{{DOT}}"))
+      // Add proper spacing after periods that aren't part of URLs or bullet points
+      .replace(/\.(?!\s*[•{{DOT}}])/g, ".\n\n")
+      // Clean up section headers
+      .replace(/([A-Z][A-Za-z\s]+:)\s*/g, "\n$1\n\n")
+      // Ensure bullet points start on new lines
+      .replace(/\s*•\s*/g, "\n• ")
       // Replace multiple newlines with max two newlines
       .replace(/\n{3,}/g, "\n\n")
       // Handle "About the job" section
       .replace(/About the job\s*\n+/g, "About the job\n\n")
-      // Trim whitespace at start and end
+      // Restore URLs by replacing temporary dots
+      .replace(/{{DOT}}/g, ".")
+      // Remove any whitespace at start and end
       .trim()
   );
 }
