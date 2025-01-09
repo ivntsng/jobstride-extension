@@ -77,13 +77,18 @@ async function initializeModalFunctionality(modal) {
     '<option value="" disabled selected>Loading dashboards...</option>';
 
   try {
-    // Use the existing Auth service instead of direct fetch
     const dashboards = await window.Auth.getUserDashboards();
 
     if (dashboards?.length) {
-      dashboardSelect.innerHTML = dashboards
-        .map((d) => `<option value="${d.id}">${d.name}</option>`)
-        .join("");
+      // Replace the entire innerHTML with just the dashboard options
+      dashboardSelect.innerHTML =
+        '<option value="" disabled>Select a dashboard...</option>' +
+        dashboards
+          .map((d) => `<option value="${d.id}">${d.name}</option>`)
+          .join("");
+
+      // Set the first dashboard as selected
+      dashboardSelect.value = dashboards[0].id;
     } else {
       dashboardSelect.innerHTML =
         '<option value="" disabled selected>No dashboards found</option>';

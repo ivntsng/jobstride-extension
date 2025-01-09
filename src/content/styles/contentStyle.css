@@ -83,15 +83,15 @@
 }
 
 .modal-content {
-  background-color: #ffffff;
+  background-color: #1a1f36;
   margin: 5% auto;
   padding: 30px;
   border: none;
   width: 90%;
   max-width: 500px;
-  border-radius: 12px;
+  border-radius: 16px;
   position: relative;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   max-height: 90vh;
   overflow-y: auto;
   display: flex;
@@ -102,7 +102,7 @@
   position: absolute;
   right: 20px;
   top: 20px;
-  color: #6b7280;
+  color: #94a3b8;
   font-size: 24px;
   font-weight: bold;
   cursor: pointer;
@@ -110,140 +110,76 @@
 }
 
 .close:hover {
-  color: #374151;
-}
-
-/* Form styles */
-.form-group {
-  margin-bottom: 20px;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: 600;
-  color: #2a9d8f;
-  font-family: "Montserrat", Arial, sans-serif;
-  font-size: 16px;
-}
-
-.form-group input[type="text"],
-.form-group input[type="url"] {
-  width: 100%;
-  padding: 12px;
-  border: 2px solid #2a9d8f;
-  border-radius: 8px;
-  font-size: 14px;
-  color: #1f2937;
-  background-color: #ffffff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: all 0.2s ease;
-}
-
-.form-group input[type="text"]:focus,
-.form-group input[type="url"]:focus {
-  border-color: #264653;
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(42, 157, 143, 0.2);
-  border-width: 2px;
-}
-
-.form-group input[type="text"]::placeholder,
-.form-group input[type="url"]::placeholder {
-  color: #6b7280;
-}
-
-.checkbox-group {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 15px 0;
-}
-
-.checkbox-group input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  border: 2px solid #cbd5e1;
-  border-radius: 4px;
-  cursor: pointer;
-  accent-color: #6366f1;
-}
-
-.btn-primary {
-  width: 100%;
-  padding: 12px;
-  background-color: #264653;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 16px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  margin-top: 20px;
-  position: relative;
-}
-
-.btn-primary:hover {
-  background-color: #2a9d8f;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 6px rgba(99, 102, 241, 0.1);
+  color: #e2e8f0;
 }
 
 .modal-content h2 {
-  color: #264653;
+  color: #ffffff;
   font-size: 24px;
   font-weight: 600;
   margin-bottom: 24px;
   font-family: "Montserrat", Arial, sans-serif;
 }
 
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #94a3b8;
+  font-family: "Montserrat", Arial, sans-serif;
+  font-size: 14px;
+}
+
+.form-group input[type="text"],
+.form-group input[type="url"],
 .form-group textarea {
   width: 100%;
   padding: 12px;
-  border: 2px solid #2a9d8f;
+  border: 1px solid #2d3748;
   border-radius: 8px;
   font-size: 14px;
-  line-height: 1.6;
-  color: #1f2937;
-  background-color: #ffffff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  color: #ffffff;
+  background-color: #2d3748;
   transition: all 0.2s ease;
-  resize: vertical;
-  min-height: 300px;
   font-family: "Montserrat", Arial, sans-serif;
-  white-space: pre-wrap;
 }
 
+.form-group input[type="text"]:focus,
+.form-group input[type="url"]:focus,
 .form-group textarea:focus {
-  border-color: #264653;
+  border-color: #60a5fa;
   outline: none;
-  box-shadow: 0 0 0 3px rgba(42, 157, 143, 0.2);
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
 }
 
-/* Markdown styling within textarea */
+.form-group input[type="text"]::placeholder,
+.form-group input[type="url"]::placeholder,
+.form-group textarea::placeholder {
+  color: #64748b;
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 12px;
+  background-color: #60a5fa;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 20px;
+}
+
+.btn-primary:hover {
+  background-color: #3b82f6;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(96, 165, 250, 0.2);
+}
+
 .form-group textarea {
-  font-family: "Montserrat", monospace;
-}
-
-.form-group textarea strong,
-.form-group textarea b {
-  font-weight: 600;
-}
-
-.form-group textarea h2,
-.form-group textarea ## {
-  font-size: 1.25em;
-  font-weight: 600;
-  margin: 1em 0 0.5em;
-}
-
-.form-group textarea ul,
-.form-group textarea * {
-  margin-left: 1em;
-  margin-bottom: 0.5em;
-}
-
-.form-group textarea p {
-  margin-bottom: 1em;
+  min-height: 200px;
+  line-height: 1.6;
+  resize: vertical;
 }
