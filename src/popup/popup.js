@@ -66,7 +66,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       salary_range: document.getElementById("salaryRange").value.trim(),
       job_description: document.getElementById("jobDescription").value.trim(),
       status: "saved",
-      applied_date: new Date().toISOString(),
+      applied_date: null,
     };
 
     try {

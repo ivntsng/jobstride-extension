@@ -118,7 +118,7 @@ async function initializeModalFunctionality(modal) {
       salary_range: document.getElementById("salaryRange").value.trim(),
       job_description: document.getElementById("jobDescription").value.trim(),
       status: "saved",
-      applied_date: new Date().toISOString(),
+      applied_date: null,
     };
 
     try {
@@ -310,13 +310,29 @@ function createFloatingButton(jobSite) {
 }
 
 // Main execution
-const hostname = window.location.hostname;
 let jobSite = null;
+const hostname = window.location.hostname;
 
+// Initialize the appropriate job site handler based on hostname
 if (hostname.includes("linkedin.com")) {
   jobSite = new LinkedIn();
+} else if (hostname.includes("indeed.com")) {
+  jobSite = new Indeed();
+} else if (hostname.includes("glassdoor.com")) {
+  jobSite = new Glassdoor();
+} else if (hostname.includes("greenhouse.io")) {
+  jobSite = new Greenhouse();
+} else if (
+  hostname.includes("workday.com") ||
+  hostname.includes("myworkday.com") ||
+  hostname.includes("myworkdayjobs.com")
+) {
+  jobSite = new Workday();
+} else if (hostname.includes("icims.com")) {
+  jobSite = new ICims();
 }
 
+// Create the floating button if we're on a job page
 if (jobSite && jobSite.isJobPage()) {
   createFloatingButton(jobSite);
 }
