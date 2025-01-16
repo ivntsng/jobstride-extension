@@ -248,3 +248,37 @@ select:focus {
     opacity: 1;
   }
 }
+
+#job-tracker-extension-popup {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 2147483647;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  width: 400px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.card {
+  position: relative;
+  padding: 20px;
+}
+
+.close-popup {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+  font-size: 20px;
+  color: #666;
+  background: none;
+  border: none;
+  padding: 5px;
+}
+
+.close-popup:hover {
+  color: #333;
+}

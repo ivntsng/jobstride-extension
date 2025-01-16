@@ -220,7 +220,11 @@ class LinkedIn extends JobSite {
 
   isJobPage() {
     const selectors = this.getSelectors();
-    return document.querySelector(selectors.jobPage) !== null;
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(document.querySelector(selectors.jobPage) !== null);
+      }, 500);
+    });
   }
 
   extractJobDetails() {
@@ -274,6 +278,11 @@ class LinkedIn extends JobSite {
 
 // Button and modal functionality
 function createFloatingButton(jobSite) {
+  // Check if button already exists
+  if (document.getElementById("job-tracker-btn")) {
+    return;
+  }
+
   console.log("Creating floating button...");
   const button = document.createElement("button");
   button.id = "job-tracker-btn";
@@ -310,29 +319,71 @@ function createFloatingButton(jobSite) {
 }
 
 // Main execution
-let jobSite = null;
-const hostname = window.location.hostname;
+function initializeJobTracker() {
+  let jobSite = null;
+  const hostname = window.location.hostname;
 
-// Initialize the appropriate job site handler based on hostname
-if (hostname.includes("linkedin.com")) {
-  jobSite = new LinkedIn();
-} else if (hostname.includes("indeed.com")) {
-  jobSite = new Indeed();
-} else if (hostname.includes("glassdoor.com")) {
-  jobSite = new Glassdoor();
-} else if (hostname.includes("greenhouse.io")) {
-  jobSite = new Greenhouse();
-} else if (
-  hostname.includes("workday.com") ||
-  hostname.includes("myworkday.com") ||
-  hostname.includes("myworkdayjobs.com")
-) {
-  jobSite = new Workday();
-} else if (hostname.includes("icims.com")) {
-  jobSite = new ICims();
+  console.log("Initializing job tracker for:", hostname);
+
+  // Initialize the appropriate job site handler based on hostname
+  if (hostname.includes("linkedin.com")) {
+    jobSite = new LinkedIn();
+  } else if (hostname.includes("indeed.com")) {
+    jobSite = new Indeed();
+  } else if (hostname.includes("glassdoor.com")) {
+    jobSite = new Glassdoor();
+  } else if (hostname.includes("greenhouse.io")) {
+    jobSite = new Greenhouse();
+  } else if (
+    hostname.includes("workday.com") ||
+    hostname.includes("myworkday.com") ||
+    hostname.includes("myworkdayjobs.com")
+  ) {
+    jobSite = new Workday();
+  } else if (hostname.includes("icims.com")) {
+    jobSite = new ICims();
+  }
+
+  if (jobSite) {
+    console.log("Job site handler created:", jobSite.constructor.name);
+    jobSite.isJobPage().then((isJobPage) => {
+      console.log("Is job page:", isJobPage);
+      if (isJobPage) {
+        createFloatingButton(jobSite);
+      }
+    });
+  }
 }
 
-// Create the floating button if we're on a job page
-if (jobSite && jobSite.isJobPage()) {
-  createFloatingButton(jobSite);
-}
+// Modify the observer configuration to be more specific
+const observer = new MutationObserver((mutations) => {
+  // Check if we already have the button
+  if (document.getElementById("job-tracker-btn")) {
+    return;
+  }
+
+  // Only run if we see relevant changes
+  const relevantChange = mutations.some((mutation) =>
+    Array.from(mutation.addedNodes).some(
+      (node) =>
+        node.nodeType === 1 &&
+        (node.matches?.(".job-view-layout, .jobs-search__job-details") ||
+          node.querySelector?.(".job-view-layout, .jobs-search__job-details"))
+    )
+  );
+
+  if (relevantChange) {
+    initializeJobTracker();
+  }
+});
+
+// More specific observation configuration
+observer.observe(document.body, {
+  childList: true,
+  subtree: true,
+  attributes: false,
+  characterData: false,
+});
+
+// Also run on initial page load
+initializeJobTracker();
