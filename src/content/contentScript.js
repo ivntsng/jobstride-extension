@@ -116,7 +116,7 @@ async function initializeModalFunctionality(modal) {
       location: document.getElementById("location").value.trim(),
       url: document.getElementById("url").value.trim(),
       salary_range: document.getElementById("salaryRange").value.trim(),
-      job_description: document.getElementById("jobDescription").value.trim(),
+      description: document.getElementById("jobDescription").value.trim(),
       status: "saved",
       applied_date: null,
     };
