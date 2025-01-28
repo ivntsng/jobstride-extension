@@ -1,7 +1,8 @@
 class Indeed extends window.JobSite {
   getSelectors() {
     return {
-      jobPage: ".jobsearch-ViewJobLayout",
+      jobPage:
+        ".jobsearch-ViewJobLayout, .job-details, .jobsearch-JobComponent",
       company: ".jobsearch-CompanyInfoContainer a",
       title: ".jobsearch-JobInfoHeader-title",
       location:
@@ -12,7 +13,14 @@ class Indeed extends window.JobSite {
 
   isJobPage() {
     const selectors = this.getSelectors();
-    return document.querySelector(selectors.jobPage) !== null;
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const element = document.querySelector(selectors.jobPage);
+        console.log("Indeed job page element:", element);
+        console.log("Current URL:", window.location.href);
+        resolve(element !== null);
+      }, 500);
+    });
   }
 
   extractJobDetails() {

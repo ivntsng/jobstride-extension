@@ -2,7 +2,7 @@
  *  Chrome Extension Setup
  *******************************/
 window.AUTH_CONFIG = {
-  apiBaseUrl: "http://localhost:8080", // Replace with your actual API URL
+  apiBaseUrl: "http://localhost:8080",
 };
 
 let currentToken = null;
@@ -213,55 +213,6 @@ function convertHtmlToText(html) {
   return text;
 }
 
-/*******************************
- *  Job Site Classes
- *******************************/
-class LinkedIn extends JobSite {
-  getSelectors() {
-    return {
-      jobPage: ".job-view-layout",
-      company: ".job-details-jobs-unified-top-card__company-name a",
-      title: ".t-24.job-details-jobs-unified-top-card__job-title h1",
-      location:
-        ".job-details-jobs-unified-top-card__primary-description-container .tvm__text:first-child",
-      description:
-        ".jobs-description__content .jobs-description-content__text--stretch",
-    };
-  }
-
-  isJobPage() {
-    const selectors = this.getSelectors();
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(document.querySelector(selectors.jobPage) !== null);
-      }, 500);
-    });
-  }
-
-  extractJobDetails() {
-    const selectors = this.getSelectors();
-    const elements = {
-      company: document.querySelector(selectors.company),
-      title: document.querySelector(selectors.title),
-      location: document.querySelector(selectors.location),
-      description: document.querySelector(selectors.description),
-    };
-
-    let description = "";
-    if (elements.description) {
-      description = convertHtmlToText(elements.description.innerHTML);
-    }
-
-    return {
-      company: elements.company?.textContent.trim() || "",
-      position: elements.title?.textContent.trim() || "",
-      location: elements.location?.textContent.trim() || "",
-      url: window.location.href,
-      jobDescription: description,
-    };
-  }
-}
-
 function createFloatingButton(jobSite) {
   // Check if button already exists
   if (document.getElementById("job-tracker-btn")) {
@@ -314,9 +265,9 @@ function initializeJobTracker() {
   console.log("Initializing job tracker for:", hostname);
 
   if (hostname.includes("linkedin.com")) {
-    jobSite = new LinkedIn();
+    jobSite = new window.LinkedIn();
   } else if (hostname.includes("indeed.com")) {
-    jobSite = new Indeed();
+    jobSite = new window.Indeed();
   } else if (hostname.includes("glassdoor.com")) {
     jobSite = new Glassdoor();
   } else if (hostname.includes("greenhouse.io")) {
