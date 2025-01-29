@@ -21,31 +21,66 @@
   "content_scripts": [
     {
       "matches": [
-        "*://*.linkedin.com/jobs/*",
-        "*://*.indeed.com/*",
+        "*://*.linkedin.com/*"
+      ],
+      "js": [
+        "src/services/auth.js",
+        "src/content/utils/utils.js",
+        "src/content/utils/modal.js",
+        "src/content/sites/base.js",
+        "src/content/sites/linkedin.js",
+        "src/content/contentScript.js"
+      ],
+      "css": [
+        "src/content/styles/contentStyle.css"
+      ],
+      "run_at": "document_end"
+    },
+    {
+      "matches": [
+        "*://*.indeed.com/*"
+      ],
+      "js": [
+        "src/services/auth.js",
+        "src/content/utils/utils.js",
+        "src/content/utils/modal.js",
+        "src/content/sites/base.js",
+        "src/content/sites/indeed.js",
+        "src/content/contentScript.js"
+      ],
+      "css": [
+        "src/content/styles/contentStyle.css"
+      ],
+      "run_at": "document_end"
+    },
+    {
+      "matches": [
         "*://*.icims.com/*"
       ],
       "js": [
         "src/services/auth.js",
         "src/content/utils/utils.js",
+        "src/content/utils/modal.js",
         "src/content/sites/base.js",
-        "src/content/sites/linkedin.js",
-        "src/content/sites/indeed.js",
         "src/content/sites/icims.js",
         "src/content/contentScript.js"
       ],
-      "css": ["src/content/styles/contentStyle.css"],
+      "css": [
+        "src/content/styles/contentStyle.css"
+      ],
       "run_at": "document_end"
     }
   ],
-  "web_accessible_resources": [{
-    "resources": [
-      "src/popup/popup.html",
-      "src/popup/popup.js",
-      "src/popup/styles/style.css"
-    ],
-    "matches": ["<all_urls>"]
-  }],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "src/popup/popup.html",
+        "src/popup/popup.js",
+        "src/popup/styles/style.css"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ],
   "oauth2": {
     "client_id": "YOUR_GITHUB_CLIENT_ID",
     "scopes": ["user:email"]

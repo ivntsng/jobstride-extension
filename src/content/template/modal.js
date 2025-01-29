@@ -1,12 +1,11 @@
-window.createModalForm = function () {
-  const modal = document.createElement("div");
-  modal.id = "job-tracker-modal";
-  modal.innerHTML = `
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>Track This Job</h2>
-        <button class="close">&times;</button>
-      </div>
+console.log("Modal template loaded");
+window.createModalTemplate = () => `
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Track This Job</h2>
+      <button class="close">&times;</button>
+    </div>
+    <div class="modal-body">
       <form id="job-form-modal">
         <div class="form-group">
           <label for="dashboardName">Select Dashboard</label>
@@ -38,12 +37,8 @@ window.createModalForm = function () {
           <label for="salaryRange">Salary Range</label>
           <input type="text" id="salaryRange" placeholder="$80k - $100k" />
         </div>
-        <div class="form-actions">
-          <button type="submit" class="btn-primary">Save</button>
-        </div>
+        <button type="submit" class="btn-primary">Save</button>
       </form>
     </div>
-  `;
-  document.body.appendChild(modal);
-  return modal;
-};
+  </div>
+`;
