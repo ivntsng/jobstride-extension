@@ -2,7 +2,7 @@
  *  Chrome Extension Setup
  *******************************/
 window.AUTH_CONFIG = {
-  apiBaseUrl: "http://localhost:8080", // Replace with your actual API URL
+  apiBaseUrl: "http://localhost:8080",
 };
 
 let currentToken = null;
@@ -23,56 +23,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 /*******************************
  *  Modal Functionality
  *******************************/
-function createModalForm() {
-  const modal = document.createElement("div");
-  modal.id = "job-tracker-modal";
-  modal.innerHTML = `
-    <div class="modal-content">
-      <span class="close">&times;</span>
-      <h2>Track This Job</h2>
-      <form id="job-form-modal">
-        <div class="form-group">
-          <label for="dashboardName">Select Dashboard</label>
-          <select id="dashboardName" required>
-            <option value="" disabled selected>Choose a dashboard...</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="company">Company</label>
-          <input type="text" id="company" placeholder="e.g. Google" required />
-        </div>
-        <div class="form-group">
-          <label for="position">Position</label>
-          <input type="text" id="position" placeholder="e.g. Frontend Engineer" required />
-        </div>
-        <div class="form-group">
-          <label for="location">Location</label>
-          <input type="text" id="location" placeholder="e.g. San Francisco" required />
-        </div>
-        <div class="form-group">
-          <label for="jobDescription">Job Description</label>
-          <textarea id="jobDescription" rows="6" placeholder="Job description and requirements"></textarea>
-        </div>
-        <div class="form-group">
-          <label for="url">Job URL</label>
-          <input type="url" id="url" placeholder="https://example.com/job-post" />
-        </div>
-        <div class="form-group">
-          <label for="salaryRange">Salary Range</label>
-          <input type="text" id="salaryRange" placeholder="$80k - $100k" />
-        </div>
-        <button type="submit" class="btn-primary">Save</button>
-      </form>
-    </div>
-  `;
-  document.body.appendChild(modal);
-
-  // Add the authentication and dashboard functionality
-  initializeModalFunctionality(modal);
-
-  return modal;
-}
-
 async function initializeModalFunctionality(modal) {
   const form = modal.querySelector("#job-form-modal");
   const dashboardSelect = modal.querySelector("#dashboardName");
@@ -213,55 +163,6 @@ function convertHtmlToText(html) {
   return text;
 }
 
-/*******************************
- *  Job Site Classes
- *******************************/
-class LinkedIn extends JobSite {
-  getSelectors() {
-    return {
-      jobPage: ".job-view-layout",
-      company: ".job-details-jobs-unified-top-card__company-name a",
-      title: ".t-24.job-details-jobs-unified-top-card__job-title h1",
-      location:
-        ".job-details-jobs-unified-top-card__primary-description-container .tvm__text:first-child",
-      description:
-        ".jobs-description__content .jobs-description-content__text--stretch",
-    };
-  }
-
-  isJobPage() {
-    const selectors = this.getSelectors();
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(document.querySelector(selectors.jobPage) !== null);
-      }, 500);
-    });
-  }
-
-  extractJobDetails() {
-    const selectors = this.getSelectors();
-    const elements = {
-      company: document.querySelector(selectors.company),
-      title: document.querySelector(selectors.title),
-      location: document.querySelector(selectors.location),
-      description: document.querySelector(selectors.description),
-    };
-
-    let description = "";
-    if (elements.description) {
-      description = convertHtmlToText(elements.description.innerHTML);
-    }
-
-    return {
-      company: elements.company?.textContent.trim() || "",
-      position: elements.title?.textContent.trim() || "",
-      location: elements.location?.textContent.trim() || "",
-      url: window.location.href,
-      jobDescription: description,
-    };
-  }
-}
-
 function createFloatingButton(jobSite) {
   // Check if button already exists
   if (document.getElementById("job-tracker-btn")) {
@@ -274,7 +175,7 @@ function createFloatingButton(jobSite) {
   button.textContent = "Track This Job";
   document.body.appendChild(button);
 
-  const modal = createModalForm();
+  const modal = window.createModalForm();
 
   button.addEventListener("click", function () {
     const jobDetails = jobSite.extractJobDetails();
@@ -287,6 +188,7 @@ function createFloatingButton(jobSite) {
     modal.querySelector("#url").value = jobDetails.url || "";
     modal.querySelector("#jobDescription").value =
       jobDetails.jobDescription || "";
+    modal.querySelector("#salaryRange").value = jobDetails.salaryRange || "";
 
     modal.style.display = "block";
   });
@@ -302,6 +204,11 @@ function createFloatingButton(jobSite) {
       modal.style.display = "none";
     }
   };
+
+  // Add the authentication and dashboard functionality
+  initializeModalFunctionality(modal);
+
+  document.body.setAttribute("data-site", "indeed");
 }
 
 /*******************************
@@ -314,9 +221,10 @@ function initializeJobTracker() {
   console.log("Initializing job tracker for:", hostname);
 
   if (hostname.includes("linkedin.com")) {
-    jobSite = new LinkedIn();
+    jobSite = new window.LinkedIn();
   } else if (hostname.includes("indeed.com")) {
-    jobSite = new Indeed();
+    jobSite = new window.Indeed();
+    document.body.setAttribute("data-site", "indeed");
   } else if (hostname.includes("glassdoor.com")) {
     jobSite = new Glassdoor();
   } else if (hostname.includes("greenhouse.io")) {
@@ -352,8 +260,12 @@ const observer = new MutationObserver((mutations) => {
     Array.from(mutation.addedNodes).some((node) => {
       if (node.nodeType !== 1) return false;
       return (
-        node.matches?.(".job-view-layout, .jobs-search__job-details") ||
-        node.querySelector?.(".job-view-layout, .jobs-search__job-details")
+        node.matches?.(
+          ".job-view-layout, .jobs-search__job-details, .job-details-jobs-container, .jobsearch-ViewJobLayout-jobDisplay"
+        ) ||
+        node.querySelector?.(
+          ".job-view-layout, .jobs-search__job-details, .job-details-jobs-container, .jobsearch-ViewJobLayout-jobDisplay"
+        )
       );
     })
   );

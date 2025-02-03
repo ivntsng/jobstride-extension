@@ -36,21 +36,200 @@
   }
 }
 
-/* Success message styling */
-.job-tracker-success {
+/* Modal Base */
+#job-tracker-modal {
+  display: none;
   position: fixed;
-  top: 20px;
-  right: 20px;
-  background: #10b981;
-  color: white;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-family: "Montserrat", Arial, sans-serif;
-  font-size: 14px;
-  z-index: 10000;
-  animation: fadeInOut 3s ease forwards;
+  z-index: 100000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  overflow-y: auto;
 }
 
+/* Modal Content */
+.modal-content {
+  background-color: #1e293b;
+  margin: 5% auto;
+  padding: 32px;
+  border: none;
+  width: 85%;
+  max-width: 460px;
+  border-radius: 16px;
+  position: relative;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* Modal Header */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #334155;
+}
+
+.modal-header h2 {
+  margin: 0;
+  color: #f8fafc;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+/* Close Button */
+.close {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s;
+  line-height: 1;
+}
+
+.close:hover {
+  color: #f8fafc;
+  background-color: #334155;
+}
+
+/* Form Groups */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #cbd5e1;
+  font-weight: 500;
+  font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", "Fira Sans", Ubuntu, Oxygen, "Oxygen Sans", Cantarell,
+    "Droid Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+    "Lucida Grande", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+}
+
+/* Form Inputs - Using LinkedIn's exact styling */
+.form-group input[type="text"],
+.form-group input[type="url"],
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #f1f5f9;
+  background-color: #2d3748;
+  transition: all 0.2s ease;
+  font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", "Fira Sans", Ubuntu, Oxygen, "Oxygen Sans", Cantarell,
+    "Droid Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+    "Lucida Grande", Helvetica, Arial, sans-serif;
+  outline: none;
+}
+
+/* Input States */
+.form-group input:hover,
+.form-group select:hover,
+.form-group textarea:hover {
+  border-color: #475569;
+}
+
+/* Focus states with LinkedIn's accent color */
+.form-group input[type="text"]:focus,
+.form-group input[type="url"]:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  border-color: #0077b5;
+  box-shadow: 0 0 0 2px rgba(0, 119, 181, 0.3);
+}
+
+/* Select Styling */
+.form-group select {
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2214%22%20height%3D%2214%22%20viewBox%3D%220%200%2014%2014%22%3E%3Cpath%20fill%3D%22%23ffffff%22%20d%3D%22M7%2010L1%204h12z%22%2F%3E%3C%2Fsvg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding: 8px 40px 8px 12px;
+  cursor: pointer;
+  height: auto;
+  min-height: 36px;
+  line-height: 1.2;
+  white-space: normal;
+  font-size: 13px;
+}
+
+/* Select options styling */
+.form-group select option {
+  background-color: #2d3748;
+  color: #f8fafc;
+  padding: 8px;
+  min-height: 36px;
+  white-space: normal;
+  font-size: 13px;
+}
+
+/* Disabled option styling */
+.form-group select option:disabled {
+  color: #94a3b8;
+}
+
+/* Textarea */
+.form-group textarea {
+  min-height: 120px;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+/* Form Actions */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 32px;
+}
+
+/* Primary Button */
+.btn-primary {
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-primary:hover {
+  background-color: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+
+/* Scrollbar Styling */
+.modal-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+  background-color: #475569;
+  border-radius: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+  background-color: #1e293b;
+}
+
+/* Success Message Animation */
 @keyframes fadeInOut {
   0% {
     opacity: 0;
@@ -70,116 +249,16 @@
   }
 }
 
-#job-tracker-modal {
-  display: none;
+.job-tracker-success {
   position: fixed;
-  z-index: 100000;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  overflow-y: auto;
-}
-
-.modal-content {
-  background-color: #1a1f36;
-  margin: 5% auto;
-  padding: 30px;
-  border: none;
-  width: 90%;
-  max-width: 500px;
-  border-radius: 16px;
-  position: relative;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  max-height: 90vh;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-}
-
-.close {
-  position: absolute;
-  right: 20px;
   top: 20px;
-  color: #94a3b8;
-  font-size: 24px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: color 0.2s ease;
-}
-
-.close:hover {
-  color: #e2e8f0;
-}
-
-.modal-content h2 {
-  color: #ffffff;
-  font-size: 24px;
-  font-weight: 600;
-  margin-bottom: 24px;
-  font-family: "Montserrat", Arial, sans-serif;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: 500;
-  color: #94a3b8;
-  font-family: "Montserrat", Arial, sans-serif;
-  font-size: 14px;
-}
-
-.form-group input[type="text"],
-.form-group input[type="url"],
-.form-group textarea {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #2d3748;
-  border-radius: 8px;
-  font-size: 14px;
-  color: #ffffff;
-  background-color: #2d3748;
-  transition: all 0.2s ease;
-  font-family: "Montserrat", Arial, sans-serif;
-}
-
-.form-group input[type="text"]:focus,
-.form-group input[type="url"]:focus,
-.form-group textarea:focus {
-  border-color: #60a5fa;
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
-}
-
-.form-group input[type="text"]::placeholder,
-.form-group input[type="url"]::placeholder,
-.form-group textarea::placeholder {
-  color: #64748b;
-}
-
-.btn-primary {
-  width: 100%;
-  padding: 12px;
-  background-color: #60a5fa;
+  right: 20px;
+  background: #10b981;
   color: white;
-  border: none;
+  padding: 12px 24px;
   border-radius: 8px;
-  font-weight: 600;
+  font-family: inherit;
   font-size: 14px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  margin-top: 20px;
-}
-
-.btn-primary:hover {
-  background-color: #3b82f6;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(96, 165, 250, 0.2);
-}
-
-.form-group textarea {
-  min-height: 200px;
-  line-height: 1.6;
-  resize: vertical;
+  z-index: 10000;
+  animation: fadeInOut 3s ease forwards;
 }
