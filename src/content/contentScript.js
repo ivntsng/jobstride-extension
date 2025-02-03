@@ -188,6 +188,7 @@ function createFloatingButton(jobSite) {
     modal.querySelector("#url").value = jobDetails.url || "";
     modal.querySelector("#jobDescription").value =
       jobDetails.jobDescription || "";
+    modal.querySelector("#salaryRange").value = jobDetails.salaryRange || "";
 
     modal.style.display = "block";
   });
