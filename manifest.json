@@ -49,7 +49,7 @@
         "src/content/contentScript.js"
       ],
       "css": [
-        "src/content/styles/contentStyle.css"
+        "src/content/styles/indeed.css"
       ],
       "run_at": "document_end"
     },

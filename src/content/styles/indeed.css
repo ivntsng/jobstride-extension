@@ -1,0 +1,239 @@
+/* Indeed-specific modal overrides */
+body[data-site="indeed"] .modal-content {
+  background-color: #ffffff;
+  margin: 2% auto;
+  padding: 40px;
+  border: none;
+  width: 90%;
+  max-width: 600px;
+  border-radius: 16px;
+  position: relative;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  max-height: 95vh;
+  overflow-y: auto;
+}
+
+/* Modal Base */
+body[data-site="indeed"] #job-tracker-modal {
+  display: none;
+  position: fixed;
+  z-index: 100000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  overflow-y: auto;
+}
+
+/* Modal Header */
+body[data-site="indeed"] .modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e4e4e4;
+}
+
+body[data-site="indeed"] .modal-header h2 {
+  margin: 0;
+  color: #2d2d2d;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+/* Close Button */
+body[data-site="indeed"] .close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #767676;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+}
+
+body[data-site="indeed"] .close:hover {
+  background-color: #f3f3f3;
+  color: #2d2d2d;
+}
+
+/* Form Layout */
+body[data-site="indeed"] form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* Form Groups - Enhanced Layout */
+body[data-site="indeed"] .form-group {
+  margin-bottom: 0;
+  width: 100%;
+  max-width: 540px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0 auto;
+}
+
+/* Form Labels */
+body[data-site="indeed"] .form-group label {
+  font-weight: 600;
+  color: #2d2d2d;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+/* Input Containers - Centered */
+body[data-site="indeed"] .form-group input[type="text"],
+body[data-site="indeed"] .form-group input[type="url"],
+body[data-site="indeed"] .form-group input[type="number"],
+body[data-site="indeed"] .form-group select,
+body[data-site="indeed"] .form-group textarea {
+  width: 100%;
+  max-width: 100%;
+  padding: 14px;
+  border: 1px solid #949494;
+  border-radius: 8px;
+  font-size: 15px;
+  color: #2d2d2d;
+  background-color: #ffffff;
+  font-family: "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  transition: all 0.2s ease;
+  margin: 0 auto;
+}
+
+/* Textarea specific height */
+body[data-site="indeed"] .form-group textarea {
+  min-height: 140px;
+}
+
+/* Form Actions - Better button alignment */
+body[data-site="indeed"] .form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+  padding-top: 16px;
+}
+
+/* Save Button */
+body[data-site="indeed"] .btn-primary,
+body[data-site="indeed"] button[type="submit"] {
+  min-width: 120px;
+  padding: 14px 32px;
+  background-color: #2557a7;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  align-self: flex-end;
+}
+
+body[data-site="indeed"] .btn-primary:hover,
+body[data-site="indeed"] button[type="submit"]:hover {
+  background-color: #1f4a8c;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 87, 167, 0.2);
+}
+
+/* Scrollbar Styling */
+body[data-site="indeed"] .modal-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+body[data-site="indeed"] .modal-content::-webkit-scrollbar-thumb {
+  background-color: #949494;
+  border-radius: 8px;
+}
+
+body[data-site="indeed"] .modal-content::-webkit-scrollbar-track {
+  background-color: #f3f3f3;
+}
+
+/* Success Message Animation */
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  10% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  90% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+body[data-site="indeed"] .job-tracker-success {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #2557a7;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 14px;
+  z-index: 10000;
+  animation: fadeInOut 3s ease forwards;
+}
+
+/* Floating Button */
+#job-tracker-btn {
+  position: fixed;
+  bottom: 100px;
+  right: 20px;
+  z-index: 999999;
+  padding: 12px 24px;
+  background: #2557a7;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-family: "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  opacity: 0;
+  transform: translateY(10px);
+  animation: slideIn 0.3s ease forwards;
+}
+
+body[data-site="indeed"] #job-tracker-btn:hover {
+  background: #1f4a8c;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 87, 167, 0.2);
+}
+
+body[data-site="indeed"] #job-tracker-btn:active {
+  transform: translateY(0);
+}
+
+@keyframes slideIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

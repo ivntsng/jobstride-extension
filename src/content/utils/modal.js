@@ -45,5 +45,9 @@ window.createModalForm = function () {
     </div>
   `;
   document.body.appendChild(modal);
+  console.log(
+    "Indeed site detected, data-site attribute set:",
+    document.body.getAttribute("data-site")
+  );
   return modal;
 };

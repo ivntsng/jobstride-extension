@@ -206,6 +206,8 @@ function createFloatingButton(jobSite) {
 
   // Add the authentication and dashboard functionality
   initializeModalFunctionality(modal);
+
+  document.body.setAttribute("data-site", "indeed");
 }
 
 /*******************************
@@ -221,6 +223,7 @@ function initializeJobTracker() {
     jobSite = new window.LinkedIn();
   } else if (hostname.includes("indeed.com")) {
     jobSite = new window.Indeed();
+    document.body.setAttribute("data-site", "indeed");
   } else if (hostname.includes("glassdoor.com")) {
     jobSite = new Glassdoor();
   } else if (hostname.includes("greenhouse.io")) {
@@ -256,8 +259,12 @@ const observer = new MutationObserver((mutations) => {
     Array.from(mutation.addedNodes).some((node) => {
       if (node.nodeType !== 1) return false;
       return (
-        node.matches?.(".job-view-layout, .jobs-search__job-details") ||
-        node.querySelector?.(".job-view-layout, .jobs-search__job-details")
+        node.matches?.(
+          ".job-view-layout, .jobs-search__job-details, .job-details-jobs-container, .jobsearch-ViewJobLayout-jobDisplay"
+        ) ||
+        node.querySelector?.(
+          ".job-view-layout, .jobs-search__job-details, .job-details-jobs-container, .jobsearch-ViewJobLayout-jobDisplay"
+        )
       );
     })
   );
