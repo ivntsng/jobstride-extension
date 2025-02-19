@@ -1,28 +1,21 @@
-/* Updated LinkedIn-specific modal styling */
+/* Base modal styling */
 .modal-content {
-  background-color: #1e293b; /* fully opaque */
-  margin: 5% auto;
-  padding: 32px;
-  border: none;
-  width: 85%;
-  max-width: 460px;
-  border-radius: 16px;
-  position: relative;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  max-height: 90vh;
-  overflow-y: auto;
-  /* Remove scale and opacity if you want text super sharp */
+  background-color: #1e293b;
   transition: transform 0.3s ease-out, opacity 0.3s ease-out;
-  transform: none; /* or just remove this line entirely */
-  opacity: 1; /* or remove this line entirely */
+  transform: none;
+  opacity: 1;
 }
 
-/* Form Labels */
+/* Form Elements Base Styling */
+.form-group {
+  margin-bottom: 20px;
+}
+
 .form-group label {
   display: block;
   margin-bottom: 8px;
   font-weight: 600;
-  color: #cbd5e1; /* Slightly lighter gray for better contrast */
+  color: #cbd5e1;
   font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto,
     "Helvetica Neue", "Fira Sans", Ubuntu, Oxygen, "Oxygen Sans", Cantarell,
     "Droid Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
@@ -30,70 +23,79 @@
   font-size: 14px;
 }
 
-/* Text inputs, textareas, and selects */
+/* Input Fields Styling */
 .form-group input[type="text"],
 .form-group input[type="url"],
 .form-group textarea,
 .form-group select {
   width: 100%;
   padding: 12px;
-  border: 1px solid #334155; /* Unified border color */
+  border: 1px solid #334155;
   border-radius: 8px;
   font-size: 14px;
-  color: #f1f5f9; /* Lighter text color for better readability */
-  background-color: #2d3748;
+  color: #f1f5f9;
+  background-color: #1e293b;
   transition: all 0.2s ease;
   font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto,
     "Helvetica Neue", "Fira Sans", Ubuntu, Oxygen, "Oxygen Sans", Cantarell,
     "Droid Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
     "Lucida Grande", Helvetica, Arial, sans-serif;
-  outline: none; /* Remove default outline to rely on custom focus styling */
+  outline: none;
+  margin-bottom: 16px;
 }
 
-/* Hover state for inputs & textareas & selects */
-.form-group input[type="text"]:hover,
-.form-group input[type="url"]:hover,
+/* Hover States */
+.form-group input:hover,
 .form-group textarea:hover,
 .form-group select:hover {
-  border-color: #475569; /* Slightly lighter on hover */
+  border-color: #475569;
+  background-color: #2d3748;
 }
 
-/* Focus states with a LinkedIn-inspired accent color (#0077B5) */
-.form-group input[type="text"]:focus,
-.form-group input[type="url"]:focus,
+/* Focus States */
+.form-group input:focus,
 .form-group textarea:focus,
 .form-group select:focus {
   border-color: #0077b5;
   box-shadow: 0 0 0 2px rgba(0, 119, 181, 0.3);
+  background-color: #2d3748;
 }
 
-/* Textarea resize control */
-.form-group textarea {
-  resize: vertical;
-}
-
-/* Select styling */
+/* Select Element Specific Styling */
 .form-group select {
   appearance: none;
-  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2214%22%20height%3D%2214%22%20viewBox%3D%220%200%2014%2014%22%3E%3Cpath%20fill%3D%22%23ffffff%22%20d%3D%22M7%2010L1%204h12z%22%2F%3E%3C%2Fsvg%3E");
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2214%22%20height%3D%2214%22%20viewBox%3D%220%200%2014%2014%22%3E%3Cpath%20fill%3D%22%23cbd5e1%22%20d%3D%22M7%2010L1%204h12z%22%2F%3E%3C%2Fsvg%3E");
   background-repeat: no-repeat;
   background-position: right 12px center;
   padding: 8px 40px 8px 12px;
-  line-height: 1.5;
-  background-color: #2d3748;
   cursor: pointer;
   height: 40px;
-}
-
-/* Options inside the select */
-.form-group select option {
-  padding: 8px 12px;
   line-height: 1.5;
-  background-color: #1e293b;
-  color: #e2e8f0;
+  color-scheme: dark;
 }
 
-/* Make scrollbars less obtrusive (for Webkit-based browsers) */
+/* Select Options */
+.form-group select option,
+.form-group select optgroup {
+  background-color: #1e293b !important;
+  color: #f1f5f9 !important;
+  padding: 12px;
+}
+
+/* Disabled State */
+.form-group select:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Textarea Specific */
+.form-group textarea {
+  min-height: 120px;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+/* Scrollbar Styling */
 .modal-content::-webkit-scrollbar {
   width: 8px;
 }

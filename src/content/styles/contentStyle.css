@@ -1,3 +1,4 @@
+/* Button Styles */
 #job-tracker-btn {
   position: fixed;
   bottom: 100px;
@@ -29,14 +30,7 @@
   transform: translateY(0);
 }
 
-@keyframes slideIn {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Modal Base */
+/* Modal Structure */
 #job-tracker-modal {
   display: none;
   position: fixed;
@@ -49,18 +43,17 @@
   overflow-y: auto;
 }
 
-/* Modal Content */
 .modal-content {
   background-color: #1e293b;
-  margin: 5% auto;
+  margin: 4% auto;
   padding: 32px;
   border: none;
-  width: 85%;
-  max-width: 460px;
+  width: 90%;
+  max-width: 600px;
   border-radius: 16px;
   position: relative;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  max-height: 90vh;
+  max-height: 92vh;
   overflow-y: auto;
 }
 
@@ -81,7 +74,6 @@
   font-weight: 600;
 }
 
-/* Close Button */
 .close {
   background: none;
   border: none;
@@ -99,7 +91,7 @@
   background-color: #334155;
 }
 
-/* Form Groups */
+/* Form Styles */
 .form-group {
   margin-bottom: 20px;
 }
@@ -108,7 +100,7 @@
   display: block;
   margin-bottom: 8px;
   color: #cbd5e1;
-  font-weight: 500;
+  font-weight: 600;
   font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto,
     "Helvetica Neue", "Fira Sans", Ubuntu, Oxygen, "Oxygen Sans", Cantarell,
     "Droid Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
@@ -116,24 +108,13 @@
   font-size: 14px;
 }
 
-/* Form Inputs - Using LinkedIn's exact styling */
+/* Form Inputs */
 .form-group input[type="text"],
 .form-group input[type="url"],
 .form-group textarea,
 .form-group select {
   width: 100%;
-  padding: 12px;
-  border: 1px solid #334155;
-  border-radius: 8px;
-  font-size: 14px;
-  color: #f1f5f9;
-  background-color: #2d3748;
-  transition: all 0.2s ease;
-  font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto,
-    "Helvetica Neue", "Fira Sans", Ubuntu, Oxygen, "Oxygen Sans", Cantarell,
-    "Droid Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
-    "Lucida Grande", Helvetica, Arial, sans-serif;
-  outline: none;
+  margin-bottom: 16px;
 }
 
 /* Input States */
@@ -141,48 +122,43 @@
 .form-group select:hover,
 .form-group textarea:hover {
   border-color: #475569;
+  background-color: #2d3748;
 }
 
-/* Focus states with LinkedIn's accent color */
-.form-group input[type="text"]:focus,
-.form-group input[type="url"]:focus,
-.form-group textarea:focus,
-.form-group select:focus {
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
   border-color: #0077b5;
   box-shadow: 0 0 0 2px rgba(0, 119, 181, 0.3);
+  background-color: #2d3748;
 }
 
-/* Select Styling */
+/* Select Specific Styling */
 .form-group select {
   appearance: none;
-  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2214%22%20height%3D%2214%22%20viewBox%3D%220%200%2014%2014%22%3E%3Cpath%20fill%3D%22%23ffffff%22%20d%3D%22M7%2010L1%204h12z%22%2F%3E%3C%2Fsvg%3E");
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2214%22%20height%3D%2214%22%20viewBox%3D%220%200%2014%2014%22%3E%3Cpath%20fill%3D%22%23cbd5e1%22%20d%3D%22M7%2010L1%204h12z%22%2F%3E%3C%2Fsvg%3E");
   background-repeat: no-repeat;
   background-position: right 12px center;
   padding: 8px 40px 8px 12px;
   cursor: pointer;
-  height: auto;
-  min-height: 36px;
-  line-height: 1.2;
-  white-space: normal;
-  font-size: 13px;
+  height: 40px;
+  line-height: 1.5;
+  color-scheme: dark;
 }
 
-/* Select options styling */
-.form-group select option {
-  background-color: #2d3748;
-  color: #f8fafc;
-  padding: 8px;
-  min-height: 36px;
-  white-space: normal;
-  font-size: 13px;
+.form-group select option,
+.form-group select optgroup {
+  background-color: #1e293b;
+  color: #f1f5f9;
+  padding: 12px;
 }
 
-/* Disabled option styling */
-.form-group select option:disabled {
-  color: #94a3b8;
+.form-group select:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 
-/* Textarea */
+/* Textarea Specific */
 .form-group textarea {
   min-height: 120px;
   resize: vertical;
@@ -229,7 +205,14 @@
   background-color: #1e293b;
 }
 
-/* Success Message Animation */
+/* Animations */
+@keyframes slideIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @keyframes fadeInOut {
   0% {
     opacity: 0;
@@ -249,6 +232,7 @@
   }
 }
 
+/* Success Message */
 .job-tracker-success {
   position: fixed;
   top: 20px;
