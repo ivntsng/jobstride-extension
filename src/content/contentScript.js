@@ -57,25 +57,28 @@ async function initializeModalFunctionality(modal) {
   form.addEventListener("submit", async function (e) {
     e.preventDefault();
 
-    const token = (await chrome.storage.local.get("token")).token;
-    if (!token) {
-      alert("Please login first");
-      return;
-    }
-
-    const jobData = {
-      dashboard_id: document.getElementById("dashboardName").value.trim(),
-      company: document.getElementById("company").value.trim(),
-      position: document.getElementById("position").value.trim(),
-      location: document.getElementById("location").value.trim(),
-      url: document.getElementById("url").value.trim(),
-      salary_range: document.getElementById("salaryRange").value.trim(),
-      description: document.getElementById("jobDescription").value.trim(),
-      status: "saved",
-      applied_date: null,
-    };
-
     try {
+      // Get token from storage
+      const tokenData = await chrome.storage.local.get("token");
+      const token = tokenData.token;
+
+      if (!token) {
+        alert("Please login first");
+        return;
+      }
+
+      const jobData = {
+        dashboard_id: document.getElementById("dashboardName").value.trim(),
+        company: document.getElementById("company").value.trim(),
+        position: document.getElementById("position").value.trim(),
+        location: document.getElementById("location").value.trim(),
+        url: document.getElementById("url").value.trim(),
+        salary_range: document.getElementById("salaryRange").value.trim(),
+        description: document.getElementById("jobDescription").value.trim(),
+        status: "saved",
+        applied_date: null,
+      };
+
       const response = await chrome.runtime.sendMessage({
         type: "FETCH_REQUEST",
         config: {
@@ -90,6 +93,19 @@ async function initializeModalFunctionality(modal) {
       });
 
       if (!response.success) {
+        // Check if the error is related to authentication
+        if (
+          response.error &&
+          (response.error.includes("token") ||
+            response.error.includes("auth") ||
+            response.error.includes("expired"))
+        ) {
+          // Trigger a re-login or token refresh
+          await chrome.runtime.sendMessage({ type: "REFRESH_TOKEN" });
+          alert("Your session has expired. Please login again.");
+          return;
+        }
+
         throw new Error(response.error || "Failed to save job");
       }
 
