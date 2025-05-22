@@ -28,7 +28,7 @@ window.createModalForm = function () {
         </div>
         <div class="form-group">
           <label for="jobDescription">Job Description</label>
-          <textarea id="jobDescription" rows="6" placeholder="Job description and requirements"></textarea>
+          <textarea id="jobDescription" placeholder="Job description and requirements"></textarea>
         </div>
         <div class="form-group">
           <label for="url">Job URL</label>
@@ -45,9 +45,5 @@ window.createModalForm = function () {
     </div>
   `;
   document.body.appendChild(modal);
-  console.log(
-    "Indeed site detected, data-site attribute set:",
-    document.body.getAttribute("data-site")
-  );
   return modal;
 };

@@ -223,8 +223,6 @@ function createFloatingButton(jobSite) {
 
   // Add the authentication and dashboard functionality
   initializeModalFunctionality(modal);
-
-  document.body.setAttribute("data-site", "indeed");
 }
 
 /*******************************
@@ -238,21 +236,26 @@ function initializeJobTracker() {
 
   if (hostname.includes("linkedin.com")) {
     jobSite = new window.LinkedIn();
+    document.body.setAttribute("data-site", "linkedin");
   } else if (hostname.includes("indeed.com")) {
     jobSite = new window.Indeed();
     document.body.setAttribute("data-site", "indeed");
   } else if (hostname.includes("glassdoor.com")) {
     jobSite = new Glassdoor();
+    document.body.setAttribute("data-site", "glassdoor");
   } else if (hostname.includes("greenhouse.io")) {
     jobSite = new Greenhouse();
+    document.body.setAttribute("data-site", "greenhouse");
   } else if (
     hostname.includes("workday.com") ||
     hostname.includes("myworkday.com") ||
     hostname.includes("myworkdayjobs.com")
   ) {
     jobSite = new Workday();
+    document.body.setAttribute("data-site", "workday");
   } else if (hostname.includes("icims.com")) {
     jobSite = new ICims();
+    document.body.setAttribute("data-site", "icims");
   }
 
   if (jobSite) {
