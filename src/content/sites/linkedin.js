@@ -31,7 +31,7 @@ class LinkedIn extends window.JobSite {
 
     let description = "";
     if (elements.description) {
-      description = convertHtmlToText(elements.description.innerHTML);
+      description = window.convertHtmlToText(elements.description.innerHTML);
     }
 
     return {

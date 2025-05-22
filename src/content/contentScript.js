@@ -179,6 +179,9 @@ function convertHtmlToText(html) {
   return text;
 }
 
+// Make convertHtmlToText available globally
+window.convertHtmlToText = convertHtmlToText;
+
 function createFloatingButton(jobSite) {
   // Check if button already exists
   if (document.getElementById("job-tracker-btn")) {
