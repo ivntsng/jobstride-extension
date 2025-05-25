@@ -181,6 +181,9 @@ function convertHtmlToText(html) {
 
 // Make convertHtmlToText available globally
 window.convertHtmlToText = convertHtmlToText;
+window.Utils = {
+  convertHtmlToText: convertHtmlToText,
+};
 
 function createFloatingButton(jobSite) {
   // Check if button already exists
@@ -191,7 +194,14 @@ function createFloatingButton(jobSite) {
   console.log("Creating floating button...");
   const button = document.createElement("button");
   button.id = "job-tracker-btn";
+
+  button.className = "track-job-button";
   button.textContent = "Track This Job";
+  button.style.position = "fixed";
+  button.style.bottom = "100px";
+  button.style.right = "20px";
+  button.style.zIndex = "9999999"; // Ensure highest z-index
+
   document.body.appendChild(button);
 
   const modal = window.createModalForm();
@@ -250,6 +260,12 @@ function initializeJobTracker() {
     jobSite = new Greenhouse();
     document.body.setAttribute("data-site", "greenhouse");
   } else if (
+    hostname.includes("jobs.ashbyhq.com") ||
+    hostname.includes("ashbyhq.com")
+  ) {
+    jobSite = new window.Ashby();
+    document.body.setAttribute("data-site", "ashby");
+  } else if (
     hostname.includes("workday.com") ||
     hostname.includes("myworkday.com") ||
     hostname.includes("myworkdayjobs.com")
@@ -283,10 +299,10 @@ const observer = new MutationObserver((mutations) => {
       if (node.nodeType !== 1) return false;
       return (
         node.matches?.(
-          ".job-view-layout, .jobs-search__job-details, .job-details-jobs-container, .jobsearch-ViewJobLayout-jobDisplay"
+          ".job-view-layout, .jobs-search__job-details, .job-details-jobs-container, .jobsearch-ViewJobLayout-jobDisplay, .job-posting, .ashby-job-posting, .ashby-job-posting-header, ._container_ud4nd_29"
         ) ||
         node.querySelector?.(
-          ".job-view-layout, .jobs-search__job-details, .job-details-jobs-container, .jobsearch-ViewJobLayout-jobDisplay"
+          ".job-view-layout, .jobs-search__job-details, .job-details-jobs-container, .jobsearch-ViewJobLayout-jobDisplay, .job-posting, .ashby-job-posting, .ashby-job-posting-header, ._container_ud4nd_29"
         )
       );
     })

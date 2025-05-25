@@ -69,6 +69,23 @@
         "src/content/styles/contentStyle.css"
       ],
       "run_at": "document_end"
+    },
+    {
+      "matches": [
+        "*://*.ashbyhq.com/*"
+      ],
+      "js": [
+        "src/services/auth.js",
+        "src/content/utils/utils.js",
+        "src/content/utils/modal.js",
+        "src/content/sites/base.js",
+        "src/content/sites/ashby.js",
+        "src/content/contentScript.js"
+      ],
+      "css": [
+        "src/content/styles/contentStyle.css"
+      ],
+      "run_at": "document_end"
     }
   ],
   "web_accessible_resources": [
