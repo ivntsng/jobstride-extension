@@ -236,34 +236,33 @@ function initializeJobTracker() {
 
   console.log("Initializing job tracker for:", hostname);
 
-  if (hostname.includes("linkedin.com")) {
-    jobSite = new window.LinkedIn();
-    document.body.setAttribute("data-site", "linkedin");
-  } else if (hostname.includes("indeed.com")) {
-    jobSite = new window.Indeed();
-    document.body.setAttribute("data-site", "indeed");
-  } else if (hostname.includes("glassdoor.com")) {
-    jobSite = new Glassdoor();
-    document.body.setAttribute("data-site", "glassdoor");
-  } else if (hostname.includes("greenhouse.io")) {
-    jobSite = new Greenhouse();
-    document.body.setAttribute("data-site", "greenhouse");
-  } else if (
-    hostname.includes("jobs.ashbyhq.com") ||
-    hostname.includes("ashbyhq.com")
-  ) {
-    jobSite = new window.Ashby();
-    document.body.setAttribute("data-site", "ashby");
-  } else if (
-    hostname.includes("workday.com") ||
-    hostname.includes("myworkday.com") ||
-    hostname.includes("myworkdayjobs.com")
-  ) {
-    jobSite = new Workday();
-    document.body.setAttribute("data-site", "workday");
-  } else if (hostname.includes("icims.com")) {
-    jobSite = new ICims();
-    document.body.setAttribute("data-site", "icims");
+  const JOB_SITE_CONFIG = {
+    "linkedin.com": {
+      handler: () => new window.LinkedIn(),
+      site: "linkedin",
+    },
+    "indeed.com": {
+      handler: () => new window.Indeed(),
+      site: "indeed",
+    },
+    "ashbyhq.com": {
+      handler: () => new window.Ashby(),
+      site: "ashby",
+    },
+    "jobs.ashbyhq.com": {
+      handler: () => new window.Ashby(),
+      site: "ashby",
+    },
+  };
+
+  const matchingSite = Object.keys(JOB_SITE_CONFIG).find((domain) =>
+    hostname.includes(domain)
+  );
+
+  if (matchingSite) {
+    const config = JOB_SITE_CONFIG[matchingSite];
+    jobSite = config.handler();
+    document.body.setAttribute("data-site", config.site);
   }
 
   if (jobSite) {
