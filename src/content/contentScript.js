@@ -179,12 +179,6 @@ function convertHtmlToText(html) {
   return text;
 }
 
-// Make convertHtmlToText available globally
-window.convertHtmlToText = convertHtmlToText;
-window.Utils = {
-  convertHtmlToText: convertHtmlToText,
-};
-
 function createFloatingButton(jobSite) {
   // Check if button already exists
   if (document.getElementById("job-tracker-btn")) {
@@ -195,12 +189,7 @@ function createFloatingButton(jobSite) {
   const button = document.createElement("button");
   button.id = "job-tracker-btn";
 
-  button.className = "track-job-button";
   button.textContent = "Track This Job";
-  button.style.position = "fixed";
-  button.style.bottom = "100px";
-  button.style.right = "20px";
-  button.style.zIndex = "9999999"; // Ensure highest z-index
 
   document.body.appendChild(button);
 
