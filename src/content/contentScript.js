@@ -257,6 +257,10 @@ function initializeJobTracker() {
       handler: () => new window.Greenhouse(),
       site: "greenhouse",
     },
+    "jobs.lever.co": {
+      handler: () => new window.Lever(),
+      site: "lever",
+    },
   };
 
   const matchingSite = Object.keys(JOB_SITE_CONFIG).find((domain) =>
