@@ -12,26 +12,16 @@ class Ashby extends window.JobSite {
   }
 
   isJobPage() {
-    console.log("Ashby.isJobPage() called");
-    console.log("Current URL:", window.location.href);
-    console.log("Hostname:", window.location.hostname);
-    console.log("Pathname:", window.location.pathname);
-
     // For Ashby, we need to check the URL first
     const isAshbyDomain = window.location.hostname === "jobs.ashbyhq.com";
-    console.log("Is Ashby domain?", isAshbyDomain);
 
     if (isAshbyDomain) {
-      console.log("Ashby URL detected:", window.location.href);
-
       // Check for the specific job posting URL pattern with UUID
       const jobPostingPattern =
         /\/[^\/]+\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
       const isValidJobUrl = jobPostingPattern.test(window.location.pathname);
-      console.log("Does URL match job posting pattern?", isValidJobUrl);
 
       if (isValidJobUrl) {
-        console.log("Ashby job page detected by URL pattern");
         return Promise.resolve(true);
       }
 
@@ -49,12 +39,9 @@ class Ashby extends window.JobSite {
           ".posting-categories",
         ];
 
-        console.log("Checking DOM selectors...");
         for (const selector of selectors) {
           const element = document.querySelector(selector);
-          console.log(`Selector "${selector}" present?`, !!element);
           if (element) {
-            console.log(`Found element with selector: ${selector}`, element);
           }
         }
 
@@ -64,22 +51,17 @@ class Ashby extends window.JobSite {
       // Wait for the DOM to be ready
       return new Promise((resolve) => {
         if (document.readyState === "complete") {
-          console.log("Document is already complete");
           const result = domCheck();
-          console.log("DOM check result:", result);
           resolve(result);
         } else {
-          console.log("Waiting for document to load...");
           window.addEventListener("load", () => {
             const result = domCheck();
-            console.log("DOM check result after load:", result);
             resolve(result);
           });
         }
       });
     }
 
-    console.log("Not an Ashby domain, returning false");
     return Promise.resolve(false);
   }
 
@@ -89,7 +71,6 @@ class Ashby extends window.JobSite {
     const logoImg = document.querySelector("._navLogoWordmarkImage_1e3cr_105");
     if (logoImg && logoImg.alt) {
       companyName = logoImg.alt.trim();
-      console.log("Found company name from logo:", companyName);
     }
 
     // If no company name found from logo, try other methods
@@ -100,7 +81,6 @@ class Ashby extends window.JobSite {
         const element = document.querySelector(selector);
         if (element) {
           companyName = element.textContent.trim();
-          console.log(`Found company name with selector: ${selector}`);
           break;
         }
       }
@@ -114,7 +94,6 @@ class Ashby extends window.JobSite {
       const element = document.querySelector(selector);
       if (element) {
         jobTitle = element.textContent.trim();
-        console.log(`Found job title with selector: ${selector}`);
         break;
       }
     }
@@ -129,7 +108,6 @@ class Ashby extends window.JobSite {
         const text = element.textContent.trim();
         if (text) {
           locationText = text;
-          console.log(`Found location with selector: ${selector}`, text);
           break;
         }
       }
@@ -147,7 +125,6 @@ class Ashby extends window.JobSite {
     for (const selector of descriptionSelectors) {
       descriptionElement = document.querySelector(selector);
       if (descriptionElement) {
-        console.log(`Found description with selector: ${selector}`);
         break;
       }
     }
@@ -174,17 +151,11 @@ class Ashby extends window.JobSite {
       const element = document.querySelector(selector);
       if (element) {
         salaryRange = element.textContent.trim();
-        console.log(`Found salary with selector: ${selector}`);
         break;
       }
     }
 
     // Log what we found for debugging
-    console.log("Company:", companyName);
-    console.log("Title:", jobTitle);
-    console.log("Location:", locationText);
-    console.log("Description length:", jobDescription.length);
-    console.log("Salary:", salaryRange);
 
     return {
       company: companyName,
