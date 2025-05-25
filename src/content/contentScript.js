@@ -253,6 +253,10 @@ function initializeJobTracker() {
       handler: () => new window.Ashby(),
       site: "ashby",
     },
+    "job-boards.greenhouse.io": {
+      handler: () => new window.Greenhouse(),
+      site: "greenhouse",
+    },
   };
 
   const matchingSite = Object.keys(JOB_SITE_CONFIG).find((domain) =>

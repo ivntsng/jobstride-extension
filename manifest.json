@@ -86,6 +86,23 @@
         "src/content/styles/ashby.css"
       ],
       "run_at": "document_end"
+    },
+    {
+      "matches": [
+        "*://*.greenhouse.io/*"
+      ],
+      "js": [
+        "src/services/auth.js",
+        "src/content/utils/utils.js",
+        "src/content/utils/modal.js",
+        "src/content/sites/base.js",
+        "src/content/sites/greenhouse.js",
+        "src/content/contentScript.js"
+      ],
+      "css": [
+        "src/content/styles/greenhouse.css"
+      ],
+      "run_at": "document_end"
     }
   ],
   "web_accessible_resources": [
