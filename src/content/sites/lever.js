@@ -12,9 +12,17 @@ class Lever extends window.JobSite {
   isJobPage() {
     const selectors = this.getSelectors();
     return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(document.querySelector(selectors.jobPage) !== null);
-      }, 500);
+      const observer = new MutationObserver(() => {
+        if (document.querySelector(selectors.jobPage) !== null) {
+          observer.disconnect();
+          resolve(true);
+        }
+      });
+      observer.observe(document.body, { childList: true, subtree: true });
+      if (document.querySelector(selectors.jobPage) !== null) {
+        observer.disconnect();
+        resolve(true);
+      }
     });
   }
 
@@ -31,8 +39,8 @@ class Lever extends window.JobSite {
     if (elements.description) {
       // Combine all sections into one description
       description = Array.from(elements.description)
-        .map(section => window.convertHtmlToText(section.innerHTML))
-        .join('\n\n');
+        .map((section) => window.convertHtmlToText(section.innerHTML))
+        .join("\n\n");
     }
 
     let location = "";
