@@ -1,0 +1,316 @@
+/* Base modal styling */
+body[data-site="lever"] .modal-content {
+  background-color: #1e293b;
+  margin: 5% auto;
+  padding: 32px;
+  border: none;
+  width: 90%;
+  max-width: 600px;
+  border-radius: 16px;
+  position: relative;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  max-height: max-content;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Modal Base */
+body[data-site="lever"] #job-tracker-modal {
+  display: none;
+  position: fixed;
+  z-index: 100000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  overflow-y: auto;
+}
+
+/* Modal Header */
+body[data-site="lever"] .modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #334155;
+}
+
+body[data-site="lever"] .modal-header h2 {
+  margin: 0;
+  color: #f8fafc;
+  font-size: 24px;
+  font-weight: 600;
+  font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", "Fira Sans", Ubuntu, Oxygen, "Oxygen Sans", Cantarell,
+    "Droid Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+    "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+/* Close Button */
+body[data-site="lever"] .close {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s;
+  line-height: 1;
+}
+
+body[data-site="lever"] .close:hover {
+  color: #f8fafc;
+  background-color: #334155;
+}
+
+/* Form Layout */
+body[data-site="lever"] form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Form Elements Base Styling */
+body[data-site="lever"] .form-group {
+  margin-bottom: 0;
+}
+
+/* Form Labels */
+body[data-site="lever"] .form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #ffffff;
+  font-weight: 600;
+  font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", "Fira Sans", Ubuntu, Oxygen, "Oxygen Sans", Cantarell,
+    "Droid Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+    "Lucida Grande", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+/* Input Fields Styling */
+body[data-site="lever"] .form-group input[type="text"],
+body[data-site="lever"] .form-group input[type="url"],
+body[data-site="lever"] .form-group textarea,
+body[data-site="lever"] .form-group select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #475569;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #f1f5f9;
+  background-color: #223047;
+  transition: all 0.2s ease;
+  font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", "Fira Sans", Ubuntu, Oxygen, "Oxygen Sans", Cantarell,
+    "Droid Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+    "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+body[data-site="lever"] .form-group input[type="text"]::placeholder,
+body[data-site="lever"] .form-group input[type="url"]::placeholder,
+body[data-site="lever"] .form-group textarea::placeholder {
+  color: #94a3b8;
+}
+
+/* Hover States */
+body[data-site="lever"] .form-group input:hover,
+body[data-site="lever"] .form-group textarea:hover,
+body[data-site="lever"] .form-group select:hover {
+  border-color: #475569;
+  background-color: #2d3748;
+}
+
+/* Focus States */
+body[data-site="lever"] .form-group input:focus,
+body[data-site="lever"] .form-group textarea:focus,
+body[data-site="lever"] .form-group select:focus {
+  border-color: #0077b5;
+  box-shadow: 0 0 0 2px rgba(0, 119, 181, 0.3);
+  background-color: #2d3748;
+}
+
+/* Select Element Specific Styling */
+body[data-site="lever"] .form-group select {
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2214%22%20height%3D%2214%22%20viewBox%3D%220%200%2014%2014%22%3E%3Cpath%20fill%3D%22%23cbd5e1%22%20d%3D%22M7%2010L1%204h12z%22%2F%3E%3C%2Fsvg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding: 8px 40px 8px 12px;
+  cursor: pointer;
+  height: 40px;
+  line-height: 1.5;
+  color-scheme: dark;
+}
+
+/* Select Options */
+body[data-site="lever"] .form-group select option,
+body[data-site="lever"] .form-group select optgroup {
+  background-color: #1e293b;
+  color: #f1f5f9;
+  padding: 12px;
+}
+
+/* Disabled State */
+body[data-site="lever"] .form-group select:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Textarea Specific */
+body[data-site="lever"] .form-group textarea {
+  min-height: 100px;
+  height: 200px;
+  max-height: 400px;
+  resize: vertical;
+  line-height: 1.6;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Form Actions */
+body[data-site="lever"] .form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid #334155;
+}
+
+/* Button Styling */
+body[data-site="lever"] .btn-primary {
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+body[data-site="lever"] .btn-primary:hover {
+  background-color: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+
+/* Track Job Button */
+body[data-site="lever"] #job-tracker-btn {
+  position: fixed;
+  bottom: 100px;
+  right: 20px;
+  z-index: 999999;
+  padding: 12px 24px;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", "Fira Sans", Ubuntu, Oxygen, "Oxygen Sans", Cantarell,
+    "Droid Sans", sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  opacity: 0;
+  transform: translateY(10px);
+  animation: slideIn 0.3s ease forwards;
+}
+
+body[data-site="lever"] #job-tracker-btn:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+
+body[data-site="lever"] #job-tracker-btn:active {
+  transform: translateY(0);
+}
+
+/* Success Message */
+body[data-site="lever"] .job-tracker-success {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #10b981;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 14px;
+  z-index: 10000;
+  animation: fadeInOut 3s ease forwards;
+}
+
+/* Scrollbar Styling */
+body[data-site="lever"] .modal-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+body[data-site="lever"] .modal-content::-webkit-scrollbar-thumb {
+  background-color: #475569;
+  border-radius: 8px;
+}
+
+body[data-site="lever"] .modal-content::-webkit-scrollbar-track {
+  background-color: #1e293b;
+}
+
+/* Animations */
+@keyframes slideIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  10% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  90% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+/* Dashboard dropdown styling */
+body[data-site="lever"] .form-group select[id*="dashboard"] {
+  background-color: #223047;
+  border: 1px solid #475569;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  width: 100%;
+  height: 40px;
+  color: #f1f5f9;
+}
+
+/* Salary range field styling */
+body[data-site="lever"] .form-group input[id*="salary"] {
+  font-size: 14px;
+  font-weight: 600;
+  width: 100%;
+  height: 40px;
+  color: #f1f5f9;
+  background-color: #223047;
+  border: 1px solid #475569;
+  border-radius: 8px;
+  padding: 8px 12px;
+}
