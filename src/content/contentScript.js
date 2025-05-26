@@ -237,35 +237,36 @@ function initializeJobTracker() {
   console.log("Initializing job tracker for:", hostname);
 
   const JOB_SITE_CONFIG = {
-    "linkedin.com": {
-      handler: () => new window.LinkedIn(),
-      site: "linkedin",
-    },
-    "indeed.com": {
-      handler: () => new window.Indeed(),
-      site: "indeed",
-    },
-    "ashbyhq.com": {
-      handler: () => new window.Ashby(),
-      site: "ashby",
-    },
-    "jobs.ashbyhq.com": {
-      handler: () => new window.Ashby(),
-      site: "ashby",
-    },
-    "job-boards.greenhouse.io": {
+    greenhouse: {
+      domains: ["job-boards.greenhouse.io", "boards.greenhouse.io"],
       handler: () => new window.Greenhouse(),
       site: "greenhouse",
     },
-    "jobs.lever.co": {
+    linkedin: {
+      domains: ["linkedin.com"],
+      handler: () => new window.LinkedIn(),
+      site: "linkedin",
+    },
+    indeed: {
+      domains: ["indeed.com"],
+      handler: () => new window.Indeed(),
+      site: "indeed",
+    },
+    ashby: {
+      domains: ["ashbyhq.com", "jobs.ashbyhq.com"],
+      handler: () => new window.Ashby(),
+      site: "ashby",
+    },
+    lever: {
+      domains: ["jobs.lever.co"],
       handler: () => new window.Lever(),
       site: "lever",
     },
   };
 
-  const matchingSite = Object.keys(JOB_SITE_CONFIG).find((domain) =>
-    hostname.includes(domain)
-  );
+  const matchingSite = Object.entries(JOB_SITE_CONFIG).find(([_, config]) =>
+    config.domains.some((domain) => hostname.includes(domain))
+  )?.[0];
 
   if (matchingSite) {
     const config = JOB_SITE_CONFIG[matchingSite];
