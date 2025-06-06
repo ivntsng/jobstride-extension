@@ -66,32 +66,33 @@ class Ashby extends window.JobSite {
   }
 
   extractJobDetails() {
-    // Try to get company name from JSON-LD data first
     let companyName = "";
+    let jobTitle = "";
+    let jsonLdData = null;
+
     const jsonLdScript = document.querySelector('script[type="application/ld+json"]');
     if (jsonLdScript) {
       try {
-        const jsonLdData = JSON.parse(jsonLdScript.textContent);
-        if (jsonLdData.hiringOrganization && jsonLdData.hiringOrganization.name) {
-          companyName = jsonLdData.hiringOrganization.name.trim();
-        }
+        jsonLdData = JSON.parse(jsonLdScript.textContent);
       } catch (error) {
         console.error("Error parsing JSON-LD data:", error);
       }
     }
 
-    // If no company name found from JSON-LD, try logo image
+    // Company name from JSON-LD
+    if (jsonLdData && jsonLdData.hiringOrganization && jsonLdData.hiringOrganization.name) {
+      companyName = jsonLdData.hiringOrganization.name.trim();
+    }
+
+    // Fallbacks for company name
     if (!companyName) {
       const logoImg = document.querySelector("._navLogoWordmarkImage_1e3cr_105");
       if (logoImg && logoImg.alt) {
         companyName = logoImg.alt.trim();
       }
     }
-
-    // If still no company name found, try other DOM methods
     if (!companyName) {
       const companySelectors = [".company-name", ".posting-headline h1", "h1"];
-
       for (const selector of companySelectors) {
         const element = document.querySelector(selector);
         if (element) {
@@ -101,21 +102,12 @@ class Ashby extends window.JobSite {
       }
     }
 
-    // Get job title
-    let jobTitle = "";
-    // Try JSON-LD first for job title
-    if (jsonLdScript) {
-      try {
-        const jsonLdData = JSON.parse(jsonLdScript.textContent);
-        if (jsonLdData.title) {
-          jobTitle = jsonLdData.title.trim();
-        }
-      } catch (error) {
-        console.error("Error parsing JSON-LD data for job title:", error);
-      }
+    // Job title from JSON-LD
+    if (jsonLdData && jsonLdData.title) {
+      jobTitle = jsonLdData.title.trim();
     }
 
-    // Fallback to DOM selectors for job title if needed
+    // Fallbacks for job title
     if (!jobTitle) {
       const titleSelectors = ["._title_ud4nd_34", "h2", ".job-title"];
       for (const selector of titleSelectors) {
@@ -183,8 +175,6 @@ class Ashby extends window.JobSite {
         break;
       }
     }
-
-    // Log what we found for debugging
 
     return {
       company: companyName,
