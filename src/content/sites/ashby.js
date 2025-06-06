@@ -66,14 +66,29 @@ class Ashby extends window.JobSite {
   }
 
   extractJobDetails() {
-    // Try to get company name from the logo image
+    // Try to get company name from JSON-LD data first
     let companyName = "";
-    const logoImg = document.querySelector("._navLogoWordmarkImage_1e3cr_105");
-    if (logoImg && logoImg.alt) {
-      companyName = logoImg.alt.trim();
+    const jsonLdScript = document.querySelector('script[type="application/ld+json"]');
+    if (jsonLdScript) {
+      try {
+        const jsonLdData = JSON.parse(jsonLdScript.textContent);
+        if (jsonLdData.hiringOrganization && jsonLdData.hiringOrganization.name) {
+          companyName = jsonLdData.hiringOrganization.name.trim();
+        }
+      } catch (error) {
+        console.error("Error parsing JSON-LD data:", error);
+      }
     }
 
-    // If no company name found from logo, try other methods
+    // If no company name found from JSON-LD, try logo image
+    if (!companyName) {
+      const logoImg = document.querySelector("._navLogoWordmarkImage_1e3cr_105");
+      if (logoImg && logoImg.alt) {
+        companyName = logoImg.alt.trim();
+      }
+    }
+
+    // If still no company name found, try other DOM methods
     if (!companyName) {
       const companySelectors = [".company-name", ".posting-headline h1", "h1"];
 
@@ -88,13 +103,27 @@ class Ashby extends window.JobSite {
 
     // Get job title
     let jobTitle = "";
-    const titleSelectors = ["._title_ud4nd_34", "h2", ".job-title"];
+    // Try JSON-LD first for job title
+    if (jsonLdScript) {
+      try {
+        const jsonLdData = JSON.parse(jsonLdScript.textContent);
+        if (jsonLdData.title) {
+          jobTitle = jsonLdData.title.trim();
+        }
+      } catch (error) {
+        console.error("Error parsing JSON-LD data for job title:", error);
+      }
+    }
 
-    for (const selector of titleSelectors) {
-      const element = document.querySelector(selector);
-      if (element) {
-        jobTitle = element.textContent.trim();
-        break;
+    // Fallback to DOM selectors for job title if needed
+    if (!jobTitle) {
+      const titleSelectors = ["._title_ud4nd_34", "h2", ".job-title"];
+      for (const selector of titleSelectors) {
+        const element = document.querySelector(selector);
+        if (element) {
+          jobTitle = element.textContent.trim();
+          break;
+        }
       }
     }
 
