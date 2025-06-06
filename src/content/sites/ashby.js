@@ -70,10 +70,15 @@ class Ashby extends window.JobSite {
     let jobTitle = "";
     let jsonLdData = null;
 
-    const jsonLdScript = document.querySelector('script[type="application/ld+json"]');
-    if (jsonLdScript) {
+    // Find all JSON-LD scripts and get the one for job posting
+    const jsonLdScripts = document.querySelectorAll('script[type="application/ld+json"]');
+    for (const script of jsonLdScripts) {
       try {
-        jsonLdData = JSON.parse(jsonLdScript.textContent);
+        const parsedData = JSON.parse(script.textContent);
+        if (parsedData && parsedData['@type'] === 'JobPosting') {
+          jsonLdData = parsedData;
+          break;
+        }
       } catch (error) {
         console.error("Error parsing JSON-LD data:", error);
       }
@@ -121,58 +126,97 @@ class Ashby extends window.JobSite {
 
     // Get location
     let locationText = "";
-    const locationSelectors = ["._left_14ib5_426 p", ".job-location"];
-
-    for (const selector of locationSelectors) {
-      const elements = document.querySelectorAll(selector);
-      for (const element of elements) {
-        const text = element.textContent.trim();
-        if (text) {
-          locationText = text;
-          break;
-        }
+    // Try to get location from JSON-LD first
+    if (jsonLdData && jsonLdData.jobLocation && jsonLdData.jobLocation.address) {
+      const address = jsonLdData.jobLocation.address;
+      const parts = [];
+      if (address.addressLocality) parts.push(address.addressLocality);
+      if (address.addressRegion) parts.push(address.addressRegion);
+      if (address.addressCountry) parts.push(address.addressCountry);
+      if (parts.length > 0) {
+        locationText = parts.join(', ');
       }
-      if (locationText) break;
+    }
+
+    // Fallback to DOM selectors for location
+    if (!locationText) {
+      const locationSelectors = ["._left_14ib5_426 p", ".job-location"];
+      for (const selector of locationSelectors) {
+        const elements = document.querySelectorAll(selector);
+        for (const element of elements) {
+          const text = element.textContent.trim();
+          if (text) {
+            locationText = text;
+            break;
+          }
+        }
+        if (locationText) break;
+      }
     }
 
     // Get description
     let jobDescription = "";
-    const descriptionSelectors = [
-      "._descriptionText_14ib5_206",
-      ".job-description",
-    ];
-
-    let descriptionElement;
-    for (const selector of descriptionSelectors) {
-      descriptionElement = document.querySelector(selector);
-      if (descriptionElement) {
-        break;
+    // Try to get description from JSON-LD first
+    if (jsonLdData && jsonLdData.description) {
+      try {
+        jobDescription = window.Utils.convertHtmlToText(jsonLdData.description);
+      } catch (error) {
+        console.error("Error converting JSON-LD description HTML to text:", error);
+        jobDescription = jsonLdData.description.replace(/<[^>]*>/g, '').trim();
       }
     }
 
-    if (descriptionElement) {
-      try {
-        jobDescription = window.Utils.convertHtmlToText(
-          descriptionElement.innerHTML
-        );
-      } catch (error) {
-        console.error("Error converting description HTML to text:", error);
-        jobDescription = descriptionElement.textContent || "";
+    // Fallback to DOM selectors for description
+    if (!jobDescription) {
+      const descriptionSelectors = [
+        "._descriptionText_14ib5_206",
+        ".job-description",
+      ];
+
+      let descriptionElement;
+      for (const selector of descriptionSelectors) {
+        descriptionElement = document.querySelector(selector);
+        if (descriptionElement) {
+          break;
+        }
+      }
+
+      if (descriptionElement) {
+        try {
+          jobDescription = window.Utils.convertHtmlToText(
+            descriptionElement.innerHTML
+          );
+        } catch (error) {
+          console.error("Error converting description HTML to text:", error);
+          jobDescription = descriptionElement.textContent || "";
+        }
       }
     }
 
     // Get salary information
     let salaryRange = "";
-    const salarySelectors = [
-      "._compensationTierSummary_14ib5_335",
-      ".compensation-range",
-    ];
+    // Try to get salary from JSON-LD first
+    if (jsonLdData && jsonLdData.baseSalary) {
+      const salary = jsonLdData.baseSalary;
+      if (salary.value && salary.value.minValue && salary.value.maxValue) {
+        const currency = salary.currency || 'USD';
+        salaryRange = `${currency} ${salary.value.minValue} - ${salary.value.maxValue} per ${salary.value.unitText?.toLowerCase() || 'year'}`;
+      }
+    }
 
-    for (const selector of salarySelectors) {
-      const element = document.querySelector(selector);
-      if (element) {
-        salaryRange = element.textContent.trim();
-        break;
+    // Fallback to DOM selectors for salary
+    if (!salaryRange) {
+      const salarySelectors = [
+        "._compensationTierSummary_14ib5_335",
+        ".compensation-range",
+      ];
+
+      for (const selector of salarySelectors) {
+        const element = document.querySelector(selector);
+        if (element) {
+          salaryRange = element.textContent.trim();
+          break;
+        }
       }
     }
 
