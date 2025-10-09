@@ -1,5 +1,5 @@
-class Greenhouse extends window.JobSite {
-  getSelectors() {
+class Greenhouse extends JobSite {
+  getSelectors(): JobSelectors {
     return {
       jobPage: ".main.font-secondary.job-post, #app_body",
       company: ".logo img, .company-name",
@@ -9,11 +9,10 @@ class Greenhouse extends window.JobSite {
     };
   }
 
-  isJobPage() {
+  isJobPage(): Promise<boolean> {
     const selectors = this.getSelectors();
     return new Promise((resolve) => {
       setTimeout(() => {
-        // Check for either regular job page or embedded application page
         const isJobPage =
           document.querySelector(selectors.jobPage) !== null ||
           window.location.pathname.includes("/embed/job_app");
@@ -27,10 +26,10 @@ class Greenhouse extends window.JobSite {
     });
   }
 
-  extractJobDetails() {
+  extractJobDetails(): JobDetails {
     const selectors = this.getSelectors();
     const elements = {
-      company: document.querySelector(selectors.company),
+      company: document.querySelector(selectors.company) as HTMLImageElement | HTMLElement | null,
       title: document.querySelector(selectors.title),
       location: document.querySelector(selectors.location),
       description: document.querySelector(selectors.description),
@@ -68,18 +67,21 @@ class Greenhouse extends window.JobSite {
     }
 
     // For embedded pages, try to get company name from URL if not found in DOM
-    let company =
-      elements.company?.alt?.replace(" Logo", "").trim() ||
-      elements.company?.textContent?.replace("at ", "").trim() ||
-      "";
+    let company = "";
+    if (elements.company instanceof HTMLImageElement) {
+      company = elements.company.alt?.replace(" Logo", "").trim() || "";
+    } else if (elements.company) {
+      company = elements.company.textContent?.replace("at ", "").trim() || "";
+    }
+
     if (!company && window.location.hostname.includes("boards.greenhouse.io")) {
       company = window.location.pathname.split("/")[1] || "";
     }
 
     return {
       company: company,
-      position: elements.title?.textContent.trim() || "",
-      location: elements.location?.textContent.trim() || "",
+      position: elements.title?.textContent?.trim() || "",
+      location: elements.location?.textContent?.trim() || "",
       url: window.location.href,
       jobDescription: description,
     };

@@ -1,29 +1,155 @@
-# nextstep-extension
+# NextStep Extension
 
-Browser Extension for the Nextstep app.
-
-## Installation Instructions
-
-1. Open Google Chrome
-2. Navigate to Menu (three dots) → Extensions → Manage Extensions
-3. Enable "Developer mode" by toggling the switch in the top right corner
-4. Click "Load unpacked"
-5. Select the directory containing the extension files
-
-## Development Setup
-
-1. Clone this repository
-2. Install dependencies (if any)
-3. Make your changes
-4. To test your changes, follow the installation instructions above
+A TypeScript-powered Chrome extension for tracking job applications across multiple job boards. Seamlessly integrates with the NextStep app to help you organize and manage your job search.
 
 ## Features
 
-- Integration with Indeed job listings
-- Integration with LinkedIn job postings
-- Custom styling for better user experience
-- Authentication system for Nextstep users
+- **Multi-Platform Support**: Works on LinkedIn, Indeed, Greenhouse, Lever, and Ashby (More to come)
+- **Auto-Fill Job Details**: Automatically extracts company, position, location, salary, and job description
+- **One-Click Save**: Save job postings with a single click
 
-## Usage
+## 🚀 Quick Start
 
-After installation, the extension will be active on Indeed and LinkedIn job posting pages. Click the extension icon in your browser toolbar to access additional features and settings.
+### Prerequisites
+
+- Google Chrome or Chromium-based browser
+
+### Installation
+
+1. **Clone the repository**
+
+   ```bash
+   git clone <repository-url>
+   cd nextstep-extension
+   ```
+
+2. **Install pnpm** (if not already installed)
+
+   ```bash
+   npm install -g pnpm
+   ```
+
+3. **Install dependencies**
+
+   ```bash
+   pnpm install
+   ```
+
+4. **Configure environment variables**
+
+   Edit `env.ts` with your API configuration:
+
+   ```env
+   # API Configuration
+   API_BASE_URL=http://localhost:8080
+   WEB_APP_URL=http://localhost:5173
+   ```
+
+5. **Build the extension**
+
+   ```bash
+   pnpm run build
+   ```
+
+6. **Load in Chrome**
+   - Open Chrome and navigate to `chrome://extensions/`
+   - Enable **"Developer mode"** (toggle in top right corner)
+   - Click **"Load unpacked"**
+   - Select the `dist/` directory from this project
+
+## 🛠️ Development
+
+### Available Scripts
+
+```bash
+# Build extension for production
+pnpm run build
+
+# Type check without building
+pnpm run type-check
+
+# Watch mode for development (TypeScript compilation)
+pnpm run dev
+
+# Clean build artifacts
+pnpm run clean
+```
+
+### Development Workflow
+
+1. Make changes to TypeScript files in `src/`
+2. Run `pnpm run build` to compile
+3. Reload the extension in Chrome (click reload icon on `chrome://extensions/`)
+4. Test your changes on supported job boards
+
+## 📁 Project Structure
+
+```
+nextstep-extension/
+├── src/
+│   ├── background/         # Background service worker
+│   │   ├── background.ts   # Main background script
+│   │   └── popupHandler.ts # Popup message handling
+│   ├── config/
+│   │   └── env.ts          # Environment configuration
+│   ├── content/
+│   │   ├── sites/          # Job site-specific handlers
+│   │   │   ├── base.ts     # Base class for all sites
+│   │   │   ├── linkedin.ts
+│   │   │   ├── indeed.ts
+│   │   │   ├── greenhouse.ts
+│   │   │   ├── lever.ts
+│   │   │   ├── ashby.ts
+│   │   ├── styles/         # Site-specific CSS
+│   │   ├── utils/          # Utility functions
+│   │   │   ├── modal.ts    # Modal form creation
+│   │   │   ├── utils.ts    # HTML/Markdown converters
+│   │   │   └── htmlToMarkdown.ts
+│   │   └── contentScript.ts # Main content script
+│   ├── popup/
+│   │   ├── popup.html      # Extension popup UI
+│   │   ├── popup.ts        # Popup logic
+│   │   └── styles/         # Popup styles
+│   ├── services/
+│   │   └── auth.ts         # Authentication service
+│   ├── types/
+│   │   └── index.ts        # TypeScript type definitions
+│   └── global.d.ts         # Global type declarations
+├── dist/                   # Compiled extension (generated)
+├── build.js               # Build script
+├── manifest.json          # Chrome extension manifest
+├── tsconfig.json          # TypeScript configuration
+├── package.json           # Project dependencies
+└── .env                   # Environment variables (create from env.example)
+```
+
+## 🎯 Supported Job Boards
+
+| Platform   | Status | Features                    |
+| ---------- | ------ | --------------------------- |
+| LinkedIn   | ✅     | Full support with auto-fill |
+| Indeed     | ✅     | Full support with auto-fill |
+| Greenhouse | ✅     | Full support with auto-fill |
+| Lever      | ✅     | Full support with auto-fill |
+| Ashby      | ✅     | Full support with auto-fill |
+
+## 💡 Usage
+
+1. Navigate to any supported job board (LinkedIn, Indeed, etc.)
+2. Open a job posting
+3. Click the **"Track This Job"** button that appears on the page
+4. Review auto-filled details (company, position, location, etc.)
+5. Select a dashboard
+6. Click **"Save"** to add to your NextStep account
+
+## 📝 Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/my-feature`
+3. Make your changes
+4. Run type check: `pnpm run type-check`
+5. Build: `pnpm run build`
+6. Test the extension thoroughly
+7. Commit: `git commit -am 'Add new feature'`
+8. Push: `git push origin feature/my-feature`
+9. Create a Pull Request

@@ -1,6 +1,6 @@
-window.createModalForm = function () {
-  const modal = document.createElement("div");
-  modal.id = "job-tracker-modal";
+function createModalForm(): HTMLElement {
+  const modal = document.createElement('div');
+  modal.id = 'job-tracker-modal';
   modal.innerHTML = `
     <div class="modal-content">
       <div class="modal-header">
@@ -46,4 +46,7 @@ window.createModalForm = function () {
   `;
   document.body.appendChild(modal);
   return modal;
-};
+}
+
+// Make it available globally
+window.createModalForm = createModalForm;

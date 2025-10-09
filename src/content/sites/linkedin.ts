@@ -1,5 +1,5 @@
-class LinkedIn extends window.JobSite {
-  getSelectors() {
+class LinkedIn extends JobSite {
+  getSelectors(): JobSelectors {
     return {
       jobPage: ".job-view-layout",
       company: ".job-details-jobs-unified-top-card__company-name a",
@@ -11,7 +11,7 @@ class LinkedIn extends window.JobSite {
     };
   }
 
-  isJobPage() {
+  isJobPage(): Promise<boolean> {
     const selectors = this.getSelectors();
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -20,7 +20,7 @@ class LinkedIn extends window.JobSite {
     });
   }
 
-  extractJobDetails() {
+  extractJobDetails(): JobDetails {
     const selectors = this.getSelectors();
     const elements = {
       company: document.querySelector(selectors.company),
@@ -35,9 +35,9 @@ class LinkedIn extends window.JobSite {
     }
 
     return {
-      company: elements.company?.textContent.trim() || "",
-      position: elements.title?.textContent.trim() || "",
-      location: elements.location?.textContent.trim() || "",
+      company: elements.company?.textContent?.trim() || "",
+      position: elements.title?.textContent?.trim() || "",
+      location: elements.location?.textContent?.trim() || "",
       url: window.location.href,
       jobDescription: description,
     };

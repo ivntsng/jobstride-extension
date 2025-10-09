@@ -1,5 +1,5 @@
-class Lever extends window.JobSite {
-  getSelectors() {
+class Lever extends JobSite {
+  getSelectors(): JobSelectors {
     return {
       jobPage: ".content-wrapper.posting-page",
       company: ".main-header-logo img",
@@ -9,7 +9,7 @@ class Lever extends window.JobSite {
     };
   }
 
-  isJobPage() {
+  isJobPage(): Promise<boolean> {
     const selectors = this.getSelectors();
     return new Promise((resolve) => {
       const observer = new MutationObserver(() => {
@@ -26,10 +26,10 @@ class Lever extends window.JobSite {
     });
   }
 
-  extractJobDetails() {
+  extractJobDetails(): JobDetails {
     const selectors = this.getSelectors();
     const elements = {
-      company: document.querySelector(selectors.company),
+      company: document.querySelector(selectors.company) as HTMLImageElement | null,
       title: document.querySelector(selectors.title),
       location: document.querySelector(selectors.location),
       description: document.querySelectorAll(selectors.description),
@@ -46,15 +46,15 @@ class Lever extends window.JobSite {
     let location = "";
     if (elements.location) {
       location = elements.location.textContent
-        .split("/")
+        ?.split("/")
         .map((loc) => loc.trim())
         .filter((loc) => loc)
-        .join(", ");
+        .join(", ") || "";
     }
 
     return {
-      company: elements.company?.alt.replace(" Logo", "").trim() || "",
-      position: elements.title?.textContent.trim() || "",
+      company: elements.company?.alt?.replace(" Logo", "").trim() || "",
+      position: elements.title?.textContent?.trim() || "",
       location: location,
       url: window.location.href,
       jobDescription: description,

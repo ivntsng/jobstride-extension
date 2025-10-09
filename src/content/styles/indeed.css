@@ -205,6 +205,7 @@ body[data-site="indeed"] .btn-primary {
   transition: all 0.2s;
   min-width: 100px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  position: relative;
 }
 
 body[data-site="indeed"] .btn-primary:hover {
@@ -216,6 +217,38 @@ body[data-site="indeed"] .btn-primary:hover {
 body[data-site="indeed"] .btn-primary:active {
   transform: translateY(0);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+body[data-site="indeed"] .btn-primary:disabled {
+  background-color: #64748b;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+body[data-site="indeed"] .btn-primary.loading {
+  pointer-events: none;
+}
+
+body[data-site="indeed"] .btn-primary.loading::after {
+  content: "";
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  top: 50%;
+  left: 50%;
+  margin-left: -8px;
+  margin-top: -8px;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  border-top-color: transparent;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Track Job Button */
@@ -359,4 +392,99 @@ body[data-site="indeed"] .form-group label {
   font-size: 14px;
   font-weight: 600;
   margin-bottom: 8px;
+}
+
+/* Toast Notification Styles */
+body[data-site="indeed"] .job-tracker-toast {
+  position: fixed;
+  top: 30px;
+  right: 30px;
+  padding: 16px 20px;
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 320px;
+  z-index: 100001;
+  animation: slideInRight 0.3s ease-out;
+  border-left: 4px solid #2557a7;
+}
+
+body[data-site="indeed"] .job-tracker-toast.success {
+  border-left-color: #10b981;
+}
+
+body[data-site="indeed"] .job-tracker-toast.error {
+  border-left-color: #ef4444;
+}
+
+body[data-site="indeed"] .job-tracker-toast .toast-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+  font-weight: 700;
+}
+
+body[data-site="indeed"] .job-tracker-toast .toast-content {
+  flex: 1;
+}
+
+body[data-site="indeed"] .job-tracker-toast .toast-title {
+  font-weight: 600;
+  color: #1a1f36;
+  margin-bottom: 4px;
+  font-size: 15px;
+}
+
+body[data-site="indeed"] .job-tracker-toast .toast-message {
+  color: #64748b;
+  font-size: 14px;
+}
+
+body[data-site="indeed"] .job-tracker-toast .toast-close {
+  cursor: pointer;
+  color: #94a3b8;
+  font-size: 20px;
+  background: none;
+  border: none;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+body[data-site="indeed"] .job-tracker-toast .toast-close:hover {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutRight {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+}
+
+body[data-site="indeed"] .job-tracker-toast.hiding {
+  animation: slideOutRight 0.3s ease-in forwards;
 }

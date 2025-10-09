@@ -16,7 +16,9 @@
   ],
   "host_permissions": [
     "http://localhost:8080/*",
-    "https://localhost:8080/*"
+    "https://localhost:8080/*",
+    "https://nextstep-app.vercel.app/*",
+    "https://nextstep-backend.vercel.app/*"
   ],
   "content_scripts": [
     {
@@ -24,6 +26,7 @@
         "*://*.linkedin.com/*"
       ],
       "js": [
+        "src/config/env.js",
         "src/services/auth.js",
         "src/content/utils/utils.js",
         "src/content/utils/modal.js",
@@ -41,6 +44,7 @@
         "*://*.indeed.com/*"
       ],
       "js": [
+        "src/config/env.js",
         "src/services/auth.js",
         "src/content/utils/utils.js",
         "src/content/utils/modal.js",
@@ -58,6 +62,7 @@
         "*://*.ashbyhq.com/*"
       ],
       "js": [
+        "src/config/env.js",
         "src/services/auth.js",
         "src/content/utils/utils.js",
         "src/content/utils/modal.js",
@@ -75,6 +80,7 @@
         "*://*.greenhouse.io/*"
       ],
       "js": [
+        "src/config/env.js",
         "src/services/auth.js",
         "src/content/utils/utils.js",
         "src/content/utils/modal.js",
@@ -92,6 +98,7 @@
         "*://*.lever.co/*"
       ],
       "js": [
+        "src/config/env.js",
         "src/services/auth.js",
         "src/content/utils/utils.js",
         "src/content/utils/modal.js",
@@ -115,14 +122,11 @@
       "matches": ["<all_urls>"]
     }
   ],
-  "oauth2": {
-    "client_id": "YOUR_GITHUB_CLIENT_ID",
-    "scopes": ["user:email"]
-  },
   "content_security_policy": {
     "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
   },
   "background": {
-    "service_worker": "src/background/background.js"
+    "service_worker": "src/background/background.js",
+    "type": "module"
   }
 }
