@@ -8,7 +8,7 @@ A TypeScript-powered Chrome extension for tracking job applications across multi
 - **Auto-Fill Job Details**: Automatically extracts company, position, location, salary, and job description
 - **One-Click Save**: Save job postings with a single click
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -57,7 +57,7 @@ A TypeScript-powered Chrome extension for tracking job applications across multi
    - Click **"Load unpacked"**
    - Select the `dist/` directory from this project
 
-## 🛠️ Development
+## Development
 
 ### Available Scripts
 
@@ -82,7 +82,38 @@ pnpm run clean
 3. Reload the extension in Chrome (click reload icon on `chrome://extensions/`)
 4. Test your changes on supported job boards
 
-## 📁 Project Structure
+## Supported Job Boards
+
+| Platform   | Status | Features                    |
+| ---------- | ------ | --------------------------- |
+| LinkedIn   | ✅     | Full support with auto-fill |
+| Indeed     | ✅     | Full support with auto-fill |
+| Greenhouse | ✅     | Full support with auto-fill |
+| Lever      | ✅     | Full support with auto-fill |
+| Ashby      | ✅     | Full support with auto-fill |
+
+## Usage
+
+1. Navigate to any supported job board (LinkedIn, Indeed, etc.)
+2. Open a job posting
+3. Click the **"Track This Job"** button that appears on the page
+4. Review auto-filled details (company, position, location, etc.)
+5. Select a dashboard
+6. Click **"Save"** to add to your NextStep account
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/my-feature`
+3. Make your changes
+4. Run type check: `pnpm run type-check`
+5. Build: `pnpm run build`
+6. Test the extension thoroughly
+7. Commit: `git commit -am 'Add new feature'`
+8. Push: `git push origin feature/my-feature`
+9. Create a Pull Request
+
+## Project Structure
 
 ```
 nextstep-extension/
@@ -122,34 +153,3 @@ nextstep-extension/
 ├── package.json           # Project dependencies
 └── .env                   # Environment variables (create from env.example)
 ```
-
-## 🎯 Supported Job Boards
-
-| Platform   | Status | Features                    |
-| ---------- | ------ | --------------------------- |
-| LinkedIn   | ✅     | Full support with auto-fill |
-| Indeed     | ✅     | Full support with auto-fill |
-| Greenhouse | ✅     | Full support with auto-fill |
-| Lever      | ✅     | Full support with auto-fill |
-| Ashby      | ✅     | Full support with auto-fill |
-
-## 💡 Usage
-
-1. Navigate to any supported job board (LinkedIn, Indeed, etc.)
-2. Open a job posting
-3. Click the **"Track This Job"** button that appears on the page
-4. Review auto-filled details (company, position, location, etc.)
-5. Select a dashboard
-6. Click **"Save"** to add to your NextStep account
-
-## 📝 Contributing
-
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/my-feature`
-3. Make your changes
-4. Run type check: `pnpm run type-check`
-5. Build: `pnpm run build`
-6. Test the extension thoroughly
-7. Commit: `git commit -am 'Add new feature'`
-8. Push: `git push origin feature/my-feature`
-9. Create a Pull Request
