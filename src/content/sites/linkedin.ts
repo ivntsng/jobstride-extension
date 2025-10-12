@@ -8,7 +8,6 @@ class LinkedIn extends JobSite {
         ".job-details-jobs-unified-top-card__primary-description-container .tvm__text:first-child",
       description:
         ".jobs-description__content .jobs-description-content__text--stretch",
-      salary: ".job-details-fit-level-preferences button:first-child strong",
     };
   }
 
@@ -28,12 +27,21 @@ class LinkedIn extends JobSite {
       title: document.querySelector(selectors.title),
       location: document.querySelector(selectors.location),
       description: document.querySelector(selectors.description),
-      salary: selectors.salary ? document.querySelector(selectors.salary) : null,
     };
 
     let description = "";
     if (elements.description) {
       description = window.convertHtmlToText(elements.description.innerHTML);
+    }
+
+    let salaryRange = "";
+    const jobDetailsButtons = document.querySelectorAll(".job-details-fit-level-preferences button strong");
+    for (const button of jobDetailsButtons) {
+      const text = button.textContent?.trim() || "";
+      if (text.includes("$") || text.match(/\d+[kK]\/yr/)) {
+        salaryRange = text;
+        break;
+      }
     }
 
     return {
@@ -42,7 +50,7 @@ class LinkedIn extends JobSite {
       location: elements.location?.textContent?.trim() || "",
       url: window.location.href,
       jobDescription: description,
-      salaryRange: elements.salary?.textContent?.trim() || "",
+      salaryRange: salaryRange,
     };
   }
 }
