@@ -183,8 +183,13 @@ function convertHtmlToText(html: string): string {
     let counter = 1;
 
     list.querySelectorAll('li').forEach((li) => {
-      const prefix = isOrdered ? `${counter}. ` : '• ';
-      li.insertAdjacentText('beforebegin', `${prefix}`);
+      const liText = li.textContent?.trim() || '';
+      if (!liText.startsWith('•') && !liText.match(/^\d+\./)) {
+        const prefix = isOrdered ? `${counter}. ` : '• ';
+        li.insertAdjacentText('beforebegin', `${prefix}`);
+      } else {
+        li.insertAdjacentText('beforebegin', '');
+      }
       li.insertAdjacentText('afterend', '\n');
       if (isOrdered) counter++;
     });
@@ -202,8 +207,11 @@ function convertHtmlToText(html: string): string {
     .split('\n')
     .map((line) => line.trim())
     .filter((line) => line.length > 0)
+    .filter((line) => line !== '•')
     .join('\n\n')
-    .replace(/\n{3,}/g, '\n\n') || '';
+    .replace(/\n{3,}/g, '\n\n')
+    .replace(/•\s*•/g, '•')
+    .trim() || '';
   return text;
 }
 
@@ -285,6 +293,11 @@ function initializeJobTracker(): void {
       handler: () => new (window as any).Lever(),
       site: 'lever',
     },
+    workday: {
+      domains: ['myworkdayjobs.com'],
+      handler: () => new (window as any).Workday(),
+      site: 'workday',
+    },
   };
 
   const matchingSite = Object.entries(JOB_SITE_CONFIG).find(([_, config]) =>
@@ -321,10 +334,10 @@ const observer = new MutationObserver((mutations) => {
       const element = node as Element;
       return (
         element.matches?.(
-          '.job-view-layout, .jobs-search__job-details, .job-details-jobs-container, .jobsearch-ViewJobLayout-jobDisplay, .job-posting, .ashby-job-posting, .ashby-job-posting-header, ._container_ud4nd_29'
+          '.job-view-layout, .jobs-search__job-details, .job-details-jobs-container, .jobsearch-ViewJobLayout-jobDisplay, .job-posting, .ashby-job-posting, .ashby-job-posting-header, ._container_ud4nd_29, [data-automation-id="jobPostingDetails"]'
         ) ||
         element.querySelector?.(
-          '.job-view-layout, .jobs-search__job-details, .job-details-jobs-container, .jobsearch-ViewJobLayout-jobDisplay, .job-posting, .ashby-job-posting, .ashby-job-posting-header, ._container_ud4nd_29'
+          '.job-view-layout, .jobs-search__job-details, .job-details-jobs-container, .jobsearch-ViewJobLayout-jobDisplay, .job-posting, .ashby-job-posting, .ashby-job-posting-header, ._container_ud4nd_29, [data-automation-id="jobPostingDetails"]'
         )
       );
     })
