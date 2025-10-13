@@ -4,16 +4,16 @@ const fs = require("fs");
 const path = require("path");
 const { execSync } = require("child_process");
 
-console.log("🔨 Building TypeScript Chrome Extension...");
+console.log("Building Extension...");
 
 if (fs.existsSync("dist")) {
   fs.rmSync("dist", { recursive: true });
 }
 
-console.log("📦 Compiling TypeScript...");
+console.log("Compiling...");
 execSync("npx tsc", { stdio: "inherit" });
 
-console.log("📋 Copying static files and generating manifest...");
+console.log("Copying static files and generating manifest...");
 
 function normalizePath(p) {
   return typeof p === "string" && p.startsWith("src/") ? p.slice(4) : p;
@@ -90,5 +90,5 @@ htmlMap.forEach(({ src, dest }) => {
   }
 });
 
-console.log("✅ Build complete! Extension ready in dist/ directory");
-console.log("📁 Load the dist/ directory as an unpacked extension in Chrome");
+console.log("Build complete! Extension ready in dist/ directory");
+console.log("Load the dist/ directory as an unpacked extension in Chrome");
