@@ -107,6 +107,7 @@ interface Window {
   Greenhouse: any;
   Ashby: any;
   Lever: any;
+  Workday: any;
   createModalForm: () => HTMLElement;
   convertHtmlToText: (html: string) => string;
   Utils: {
