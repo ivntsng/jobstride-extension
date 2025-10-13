@@ -103,6 +103,14 @@ body[data-site="greenhouse"] .form-group select {
     "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
+/* Textarea specific styling */
+body[data-site="greenhouse"] .form-group textarea {
+  min-height: 120px;
+  max-height: 400px;
+  resize: vertical;
+  overflow-y: auto;
+}
+
 /* Input States */
 body[data-site="greenhouse"] .form-group input:hover,
 body[data-site="greenhouse"] .form-group select:hover,
@@ -269,16 +277,19 @@ body[data-site="greenhouse"] .btn-primary.loading::after {
 }
 
 /* Scrollbar Styling */
-body[data-site="greenhouse"] .modal-content::-webkit-scrollbar {
+body[data-site="greenhouse"] .modal-content::-webkit-scrollbar,
+body[data-site="greenhouse"] .form-group textarea::-webkit-scrollbar {
   width: 8px;
 }
 
-body[data-site="greenhouse"] .modal-content::-webkit-scrollbar-thumb {
+body[data-site="greenhouse"] .modal-content::-webkit-scrollbar-thumb,
+body[data-site="greenhouse"] .form-group textarea::-webkit-scrollbar-thumb {
   background-color: #475569;
   border-radius: 8px;
 }
 
-body[data-site="greenhouse"] .modal-content::-webkit-scrollbar-track {
+body[data-site="greenhouse"] .modal-content::-webkit-scrollbar-track,
+body[data-site="greenhouse"] .form-group textarea::-webkit-scrollbar-track {
   background-color: #1e293b;
 }
 
