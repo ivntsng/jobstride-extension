@@ -13,7 +13,7 @@ class Workday extends JobSite {
     return new Promise((resolve) => {
       setTimeout(() => {
         const hasJobDetails = document.querySelector('[data-automation-id="jobPostingDetails"]') !== null;
-        const isJobUrl = window.location.pathname.includes('/details/');
+        const isJobUrl = window.location.pathname.includes('/details/') || window.location.pathname.includes('/job/');
         resolve(hasJobDetails || isJobUrl);
       }, 500);
     });
