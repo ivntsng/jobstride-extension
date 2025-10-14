@@ -102,16 +102,16 @@ body[data-site="ashby"] .modal-content .form-group textarea,
 body[data-site="ashby"] .modal-content .form-group select {
   width: 100%;
   padding: 12px 16px;
-  border: 1px solid #475569;
+  border: 1px solid #334155;
   border-radius: 8px;
   font-size: 15px;
-  color: #1e293b;
-  background-color: #ffffff !important;
+  color: #f1f5f9;
+  background-color: #1e293b;
   transition: all 0.2s ease;
   font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto,
     Oxygen, Ubuntu, Cantarell, sans-serif;
   outline: none;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 /* URL field styling */
@@ -128,8 +128,8 @@ body[data-site="ashby"] .modal-content .form-group input[type="text"]:hover,
 body[data-site="ashby"] .modal-content .form-group input[type="url"]:hover,
 body[data-site="ashby"] .modal-content .form-group textarea:hover,
 body[data-site="ashby"] .modal-content .form-group select:hover {
-  border-color: #64748b;
-  background-color: #ffffff !important;
+  border-color: #475569;
+  background-color: #2d3748;
 }
 
 /* Focus States with increased specificity */
@@ -139,25 +139,25 @@ body[data-site="ashby"] .modal-content .form-group textarea:focus,
 body[data-site="ashby"] .modal-content .form-group select:focus {
   border-color: #3b82f6;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
-  background-color: #ffffff !important;
+  background-color: #2d3748;
 }
 
 /* Select Element Specific Styling with increased specificity */
 body[data-site="ashby"] .modal-content .form-group select {
   appearance: none;
-  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2214%22%20height%3D%2214%22%20viewBox%3D%220%200%2014%2014%22%3E%3Cpath%20fill%3D%22%23475569%22%20d%3D%22M7%2010L1%204h12z%22%2F%3E%3C%2Fsvg%3E");
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2214%22%20height%3D%2214%22%20viewBox%3D%220%200%2014%2014%22%3E%3Cpath%20fill%3D%22%23cbd5e1%22%20d%3D%22M7%2010L1%204h12z%22%2F%3E%3C%2Fsvg%3E");
   background-repeat: no-repeat;
   background-position: right 16px center;
   padding-right: 40px;
   cursor: pointer;
-  background-color: #ffffff !important;
+  color-scheme: dark;
 }
 
 /* Select Options with increased specificity */
 body[data-site="ashby"] .modal-content .form-group select option,
 body[data-site="ashby"] .modal-content .form-group select optgroup {
-  background-color: #ffffff !important;
-  color: #1e293b !important;
+  background-color: #1e293b !important;
+  color: #f1f5f9 !important;
   padding: 12px;
 }
 
@@ -172,8 +172,6 @@ body[data-site="ashby"] .modal-content .form-group textarea {
   min-height: 160px;
   resize: vertical;
   line-height: 1.6;
-  background-color: #ffffff !important;
-  color: #1e293b !important;
 }
 
 /* Job description textarea styling with increased specificity */
@@ -182,8 +180,6 @@ body[data-site="ashby"] .modal-content .form-group textarea[id*="description"] {
   font-size: 14px;
   line-height: 1.6;
   padding: 16px;
-  background-color: #ffffff !important;
-  color: #1e293b !important;
 }
 
 /* Form Actions */
@@ -340,7 +336,7 @@ body[data-site="ashby"] .modal-content::-webkit-scrollbar-track {
 
 /* Dashboard dropdown styling */
 body[data-site="ashby"] .form-group select[id*="dashboard"] {
-  background-color: #2d3748;
+  background-color: #1e293b;
   border: 1px solid #334155;
   border-radius: 8px;
   font-size: 15px;

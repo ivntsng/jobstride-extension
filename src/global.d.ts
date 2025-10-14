@@ -108,6 +108,7 @@ interface Window {
   Ashby: any;
   Lever: any;
   Workday: any;
+  Rippling: any;
   createModalForm: () => HTMLElement;
   convertHtmlToText: (html: string) => string;
   Utils: {
