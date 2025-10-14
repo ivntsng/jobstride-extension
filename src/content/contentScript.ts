@@ -298,6 +298,11 @@ function initializeJobTracker(): void {
       handler: () => new (window as any).Workday(),
       site: 'workday',
     },
+    rippling: {
+      domains: ['ats.rippling.com', 'rippling.com'],
+      handler: () => new (window as any).Rippling(),
+      site: 'rippling',
+    },
   };
 
   const matchingSite = Object.entries(JOB_SITE_CONFIG).find(([_, config]) =>
@@ -334,10 +339,10 @@ const observer = new MutationObserver((mutations) => {
       const element = node as Element;
       return (
         element.matches?.(
-          '.job-view-layout, .jobs-search__job-details, .job-details-jobs-container, .jobsearch-ViewJobLayout-jobDisplay, .job-posting, .ashby-job-posting, .ashby-job-posting-header, ._container_ud4nd_29, [data-automation-id="jobPostingDetails"]'
+          '.job-view-layout, .jobs-search__job-details, .job-details-jobs-container, .jobsearch-ViewJobLayout-jobDisplay, .job-posting, .ashby-job-posting, .ashby-job-posting-header, ._container_ud4nd_29, [data-automation-id="jobPostingDetails"], [data-testid="breadcrumb"], .ATS_htmlPreview'
         ) ||
         element.querySelector?.(
-          '.job-view-layout, .jobs-search__job-details, .job-details-jobs-container, .jobsearch-ViewJobLayout-jobDisplay, .job-posting, .ashby-job-posting, .ashby-job-posting-header, ._container_ud4nd_29, [data-automation-id="jobPostingDetails"]'
+          '.job-view-layout, .jobs-search__job-details, .job-details-jobs-container, .jobsearch-ViewJobLayout-jobDisplay, .job-posting, .ashby-job-posting, .ashby-job-posting-header, ._container_ud4nd_29, [data-automation-id="jobPostingDetails"], [data-testid="breadcrumb"], .ATS_htmlPreview'
         )
       );
     })
