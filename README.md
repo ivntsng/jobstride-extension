@@ -4,7 +4,7 @@ A TypeScript-powered Chrome extension for tracking job applications across multi
 
 ## Features
 
-- **Multi-Platform Support**: Works on LinkedIn, Indeed, Greenhouse, Lever, Ashby, and Workday (More to come)
+- **Multi-Platform Support**: Works on LinkedIn, Indeed, Greenhouse, Lever, Ashby, Rippling, and Workday (More to come)
 - **Auto-Fill Job Details**: Automatically extracts company, position, location, salary, and job description
 - **One-Click Save**: Save job postings with a single click
 
@@ -92,6 +92,8 @@ pnpm run clean
 | Lever      | ✅     | Full support with auto-fill |
 | Ashby      | ✅     | Full support with auto-fill |
 | Workday    | ✅     | Full support with auto-fill |
+| Rippling    | ✅     | Full support with auto-fill |
+
 
 ## Usage
 
