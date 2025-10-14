@@ -53,7 +53,7 @@
         "src/content/contentScript.js"
       ],
       "css": [
-        "src/content/styles/indeed.css"
+        "src/content/styles/contentStyle.css"
       ],
       "run_at": "document_end"
     },
@@ -71,7 +71,7 @@
         "src/content/contentScript.js"
       ],
       "css": [
-        "src/content/styles/ashby.css"
+        "src/content/styles/contentStyle.css"
       ],
       "run_at": "document_end"
     },
@@ -89,7 +89,7 @@
         "src/content/contentScript.js"
       ],
       "css": [
-        "src/content/styles/greenhouse.css"
+        "src/content/styles/contentStyle.css"
       ],
       "run_at": "document_end"
     },
@@ -107,7 +107,7 @@
         "src/content/contentScript.js"
       ],
       "css": [
-        "src/content/styles/lever.css"
+        "src/content/styles/contentStyle.css"
       ],
       "run_at": "document_end"
     },
@@ -125,7 +125,7 @@
         "src/content/contentScript.js"
       ],
       "css": [
-        "src/content/styles/workday.css"
+        "src/content/styles/contentStyle.css"
       ],
       "run_at": "document_end"
     },
@@ -143,7 +143,7 @@
         "src/content/contentScript.js"
       ],
       "css": [
-        "src/content/styles/rippling.css"
+        "src/content/styles/contentStyle.css"
       ],
       "run_at": "document_end"
     }
