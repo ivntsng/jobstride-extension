@@ -79,6 +79,24 @@ cssDirs.forEach(({ src, dest }) => {
   }
 });
 
+const iconDirs = [{ src: "icons", dest: "dist/icons" }];
+
+iconDirs.forEach(({ src, dest }) => {
+  if (fs.existsSync(src)) {
+    fs.mkdirSync(dest, { recursive: true });
+    const files = fs.readdirSync(src);
+    files.forEach((file) => {
+      if (
+        file.endsWith(".png") ||
+        file.endsWith(".svg") ||
+        file.endsWith(".ico")
+      ) {
+        fs.copyFileSync(path.join(src, file), path.join(dest, file));
+      }
+    });
+  }
+});
+
 const htmlMap = [
   { src: "src/popup/popup.html", dest: "dist/popup/popup.html" },
 ];
