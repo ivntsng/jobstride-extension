@@ -19,7 +19,7 @@ A TypeScript-powered Chrome extension for tracking job applications across multi
 1. **Clone the repository**
 
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/ivntsng/nextstep-extension.git
    cd nextstep-extension
    ```
 
@@ -92,8 +92,7 @@ pnpm run clean
 | Lever      | ✅     | Full support with auto-fill |
 | Ashby      | ✅     | Full support with auto-fill |
 | Workday    | ✅     | Full support with auto-fill |
-| Rippling    | ✅     | Full support with auto-fill |
-
+| Rippling   | ✅     | Full support with auto-fill |
 
 ## Usage
 
