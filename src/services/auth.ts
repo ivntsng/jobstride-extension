@@ -12,14 +12,12 @@ class Auth implements AuthService {
       if (chromeToken.token) return true;
 
       if (chrome.tabs) {
-        const result = await chrome.tabs.query({
-          active: true,
-          currentWindow: true,
-        });
-
         const webAppUrl = (window as any).AUTH_CONFIG?.webAppUrl || '';
-        if (result[0]?.url?.includes(webAppUrl)) {
-          const [tab] = result;
+        if (!webAppUrl) return false;
+
+        const tabs = await chrome.tabs.query({ url: `${webAppUrl}/*` });
+
+        for (const tab of tabs) {
           if (tab.id) {
             try {
               const token = await chrome.scripting.executeScript({
