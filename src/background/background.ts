@@ -1,4 +1,4 @@
-chrome.runtime.onMessage.addListener((message: any, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((message: any, _sender, sendResponse) => {
   if (message.type === 'FETCH_REQUEST' && message.config) {
     handleFetchRequest(message.config)
       .then((response) => sendResponse(response))
@@ -8,7 +8,9 @@ chrome.runtime.onMessage.addListener((message: any, sender, sendResponse) => {
   return false;
 });
 
-async function handleFetchRequest(config: any): Promise<{ success: boolean; data?: any; error?: string }> {
+async function handleFetchRequest(
+  config: any,
+): Promise<{ success: boolean; data?: any; error?: string }> {
   try {
     const response = await fetch(config.url, {
       method: config.method,
@@ -26,7 +28,7 @@ async function handleFetchRequest(config: any): Promise<{ success: boolean; data
     console.error('Fetch request failed:', error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: error instanceof Error ? error.message : 'Unknown error',
     };
   }
 }

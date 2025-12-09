@@ -17,13 +17,7 @@
       "32": "icons/favicon_24x24.png"
     }
   },
-  "permissions": [
-    "storage",
-    "activeTab",
-    "scripting",
-    "webRequest",
-    "windows"
-  ],
+  "permissions": ["storage", "activeTab", "scripting", "webRequest", "windows"],
   "host_permissions": [
     "http://localhost:8080/*",
     "https://localhost:8080/*",
@@ -32,9 +26,7 @@
   ],
   "content_scripts": [
     {
-      "matches": [
-        "*://*.linkedin.com/*"
-      ],
+      "matches": ["*://*.linkedin.com/*"],
       "js": [
         "src/config/env.js",
         "src/services/auth.js",
@@ -44,15 +36,11 @@
         "src/content/sites/linkedin.js",
         "src/content/contentScript.js"
       ],
-      "css": [
-        "src/content/styles/contentStyle.css"
-      ],
+      "css": ["src/content/styles/contentStyle.css"],
       "run_at": "document_end"
     },
     {
-      "matches": [
-        "*://*.indeed.com/*"
-      ],
+      "matches": ["*://*.indeed.com/*"],
       "js": [
         "src/config/env.js",
         "src/services/auth.js",
@@ -62,15 +50,11 @@
         "src/content/sites/indeed.js",
         "src/content/contentScript.js"
       ],
-      "css": [
-        "src/content/styles/contentStyle.css"
-      ],
+      "css": ["src/content/styles/contentStyle.css"],
       "run_at": "document_end"
     },
     {
-      "matches": [
-        "*://*.ashbyhq.com/*"
-      ],
+      "matches": ["*://*.ashbyhq.com/*"],
       "js": [
         "src/config/env.js",
         "src/services/auth.js",
@@ -80,15 +64,11 @@
         "src/content/sites/ashby.js",
         "src/content/contentScript.js"
       ],
-      "css": [
-        "src/content/styles/contentStyle.css"
-      ],
+      "css": ["src/content/styles/contentStyle.css"],
       "run_at": "document_end"
     },
     {
-      "matches": [
-        "*://*.greenhouse.io/*"
-      ],
+      "matches": ["*://*.greenhouse.io/*"],
       "js": [
         "src/config/env.js",
         "src/services/auth.js",
@@ -98,15 +78,11 @@
         "src/content/sites/greenhouse.js",
         "src/content/contentScript.js"
       ],
-      "css": [
-        "src/content/styles/contentStyle.css"
-      ],
+      "css": ["src/content/styles/contentStyle.css"],
       "run_at": "document_end"
     },
     {
-      "matches": [
-        "*://*.lever.co/*"
-      ],
+      "matches": ["*://*.lever.co/*"],
       "js": [
         "src/config/env.js",
         "src/services/auth.js",
@@ -116,15 +92,11 @@
         "src/content/sites/lever.js",
         "src/content/contentScript.js"
       ],
-      "css": [
-        "src/content/styles/contentStyle.css"
-      ],
+      "css": ["src/content/styles/contentStyle.css"],
       "run_at": "document_end"
     },
     {
-      "matches": [
-        "*://*.myworkdayjobs.com/*"
-      ],
+      "matches": ["*://*.myworkdayjobs.com/*"],
       "js": [
         "src/config/env.js",
         "src/services/auth.js",
@@ -134,15 +106,11 @@
         "src/content/sites/workday.js",
         "src/content/contentScript.js"
       ],
-      "css": [
-        "src/content/styles/contentStyle.css"
-      ],
+      "css": ["src/content/styles/contentStyle.css"],
       "run_at": "document_end"
     },
     {
-      "matches": [
-        "*://*.rippling.com/*"
-      ],
+      "matches": ["*://*.rippling.com/*"],
       "js": [
         "src/config/env.js",
         "src/services/auth.js",
@@ -152,9 +120,7 @@
         "src/content/sites/rippling.js",
         "src/content/contentScript.js"
       ],
-      "css": [
-        "src/content/styles/contentStyle.css"
-      ],
+      "css": ["src/content/styles/contentStyle.css"],
       "run_at": "document_end"
     }
   ],

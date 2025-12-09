@@ -3,7 +3,7 @@ const defaultConfig: EnvConfig = {
   WEB_APP_URL: 'https://nextstep-app.vercel.app',
 };
 
-function getEnvVar(key: keyof EnvConfig, defaultValue: string): string {
+function getEnvVar(_key: keyof EnvConfig, defaultValue: string): string {
   return defaultValue;
 }
 

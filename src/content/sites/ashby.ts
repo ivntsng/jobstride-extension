@@ -2,21 +2,21 @@ class Ashby extends JobSite {
   getSelectors(): JobSelectors {
     return {
       jobPage:
-        "._navRoot_1e3cr_29, .ashby-job-posting-header, ._container_ud4nd_29",
-      company: "._navLogoWordmarkImage_1e3cr_105",
-      title: "._title_ud4nd_34, h2",
-      location: "._left_14ib5_426 p, .job-location",
-      description: "._descriptionText_14ib5_206, .job-description",
-      salary: "._compensationTierSummary_14ib5_335",
+        '._navRoot_1e3cr_29, .ashby-job-posting-header, ._container_ud4nd_29',
+      company: '._navLogoWordmarkImage_1e3cr_105',
+      title: '._title_ud4nd_34, h2',
+      location: '._left_14ib5_426 p, .job-location',
+      description: '._descriptionText_14ib5_206, .job-description',
+      salary: '._compensationTierSummary_14ib5_335',
     };
   }
 
   isJobPage(): Promise<boolean> {
-    const isAshbyDomain = window.location.hostname === "jobs.ashbyhq.com";
+    const isAshbyDomain = window.location.hostname === 'jobs.ashbyhq.com';
 
     if (isAshbyDomain) {
       const jobPostingPattern =
-        /\/[^\/]+\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
+        /\/[^/]+\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
       const isValidJobUrl = jobPostingPattern.test(window.location.pathname);
 
       if (isValidJobUrl) {
@@ -25,14 +25,14 @@ class Ashby extends JobSite {
 
       const domCheck = (): boolean => {
         const selectors = [
-          ".ashby-job-posting-page",
+          '.ashby-job-posting-page',
           "[data-testid='job-posting']",
-          ".posting-headline",
-          ".posting-content",
-          "h1",
-          "h2",
-          ".job-description",
-          ".posting-categories",
+          '.posting-headline',
+          '.posting-content',
+          'h1',
+          'h2',
+          '.job-description',
+          '.posting-categories',
         ];
 
         for (const selector of selectors) {
@@ -45,11 +45,11 @@ class Ashby extends JobSite {
       };
 
       return new Promise((resolve) => {
-        if (document.readyState === "complete") {
+        if (document.readyState === 'complete') {
           const result = domCheck();
           resolve(result);
         } else {
-          window.addEventListener("load", () => {
+          window.addEventListener('load', () => {
             const result = domCheck();
             resolve(result);
           });
@@ -61,11 +61,13 @@ class Ashby extends JobSite {
   }
 
   extractJobDetails(): JobDetails {
-    let companyName = "";
-    let jobTitle = "";
+    let companyName = '';
+    let jobTitle = '';
     let jsonLdData: any = null;
 
-    const jsonLdScripts = document.querySelectorAll('script[type="application/ld+json"]');
+    const jsonLdScripts = document.querySelectorAll(
+      'script[type="application/ld+json"]',
+    );
     for (const script of jsonLdScripts) {
       try {
         const parsedData = JSON.parse(script.textContent || '');
@@ -74,22 +76,24 @@ class Ashby extends JobSite {
           break;
         }
       } catch (error) {
-        console.error("Error parsing JSON-LD data:", error);
+        console.error('Error parsing JSON-LD data:', error);
       }
     }
 
-    if (jsonLdData && jsonLdData.hiringOrganization && jsonLdData.hiringOrganization.name) {
+    if (jsonLdData?.hiringOrganization?.name) {
       companyName = jsonLdData.hiringOrganization.name.trim();
     }
 
     if (!companyName) {
-      const logoImg = document.querySelector("._navLogoWordmarkImage_1e3cr_105") as HTMLImageElement;
-      if (logoImg && logoImg.alt) {
+      const logoImg = document.querySelector(
+        '._navLogoWordmarkImage_1e3cr_105',
+      ) as HTMLImageElement;
+      if (logoImg?.alt) {
         companyName = logoImg.alt.trim();
       }
     }
     if (!companyName) {
-      const companySelectors = [".company-name", ".posting-headline h1", "h1"];
+      const companySelectors = ['.company-name', '.posting-headline h1', 'h1'];
       for (const selector of companySelectors) {
         const element = document.querySelector(selector);
         if (element) {
@@ -99,12 +103,12 @@ class Ashby extends JobSite {
       }
     }
 
-    if (jsonLdData && jsonLdData.title) {
+    if (jsonLdData?.title) {
       jobTitle = jsonLdData.title.trim();
     }
 
     if (!jobTitle) {
-      const titleSelectors = ["._title_ud4nd_34", "h2", ".job-title"];
+      const titleSelectors = ['._title_ud4nd_34', 'h2', '.job-title'];
       for (const selector of titleSelectors) {
         const element = document.querySelector(selector);
         if (element) {
@@ -114,8 +118,8 @@ class Ashby extends JobSite {
       }
     }
 
-    let locationText = "";
-    if (jsonLdData && jsonLdData.jobLocation && jsonLdData.jobLocation.address) {
+    let locationText = '';
+    if (jsonLdData?.jobLocation?.address) {
       const address = jsonLdData.jobLocation.address;
       const parts: string[] = [];
       if (address.addressLocality) parts.push(address.addressLocality);
@@ -127,7 +131,7 @@ class Ashby extends JobSite {
     }
 
     if (!locationText) {
-      const locationSelectors = ["._left_14ib5_426 p", ".job-location"];
+      const locationSelectors = ['._left_14ib5_426 p', '.job-location'];
       for (const selector of locationSelectors) {
         const elements = document.querySelectorAll(selector);
         for (const element of elements) {
@@ -141,20 +145,23 @@ class Ashby extends JobSite {
       }
     }
 
-    let jobDescription = "";
-    if (jsonLdData && jsonLdData.description) {
+    let jobDescription = '';
+    if (jsonLdData?.description) {
       try {
         jobDescription = window.Utils.convertHtmlToText(jsonLdData.description);
       } catch (error) {
-        console.error("Error converting JSON-LD description HTML to text:", error);
+        console.error(
+          'Error converting JSON-LD description HTML to text:',
+          error,
+        );
         jobDescription = jsonLdData.description.replace(/<[^>]*>/g, '').trim();
       }
     }
 
     if (!jobDescription) {
       const descriptionSelectors = [
-        "._descriptionText_14ib5_206",
-        ".job-description",
+        '._descriptionText_14ib5_206',
+        '.job-description',
       ];
 
       let descriptionElement: Element | null = null;
@@ -168,19 +175,19 @@ class Ashby extends JobSite {
       if (descriptionElement) {
         try {
           jobDescription = window.Utils.convertHtmlToText(
-            descriptionElement.innerHTML
+            descriptionElement.innerHTML,
           );
         } catch (error) {
-          console.error("Error converting description HTML to text:", error);
-          jobDescription = descriptionElement.textContent || "";
+          console.error('Error converting description HTML to text:', error);
+          jobDescription = descriptionElement.textContent || '';
         }
       }
     }
 
-    let salaryRange = "";
-    if (jsonLdData && jsonLdData.baseSalary) {
+    let salaryRange = '';
+    if (jsonLdData?.baseSalary) {
       const salary = jsonLdData.baseSalary;
-      if (salary.value && salary.value.minValue && salary.value.maxValue) {
+      if (salary.value?.minValue && salary.value.maxValue) {
         const currency = salary.currency || 'USD';
         salaryRange = `${currency} ${salary.value.minValue} - ${salary.value.maxValue} per ${salary.value.unitText?.toLowerCase() || 'year'}`;
       }
@@ -188,8 +195,8 @@ class Ashby extends JobSite {
 
     if (!salaryRange) {
       const salarySelectors = [
-        "._compensationTierSummary_14ib5_335",
-        ".compensation-range",
+        '._compensationTierSummary_14ib5_335',
+        '.compensation-range',
       ];
 
       for (const selector of salarySelectors) {

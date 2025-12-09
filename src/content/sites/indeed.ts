@@ -77,7 +77,7 @@ class Indeed extends JobSite {
     let jobDescription = '';
     if (elements.description) {
       jobDescription = window.Utils.convertHtmlToMarkdown(
-        elements.description.innerHTML
+        elements.description.innerHTML,
       );
     }
 

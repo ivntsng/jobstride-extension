@@ -71,6 +71,15 @@ bun run type-check
 # Watch mode for development (TypeScript compilation)
 bun run dev
 
+# Lint and check formatting
+bun run lint
+
+# Lint and auto-fix issues
+bun run lint:fix
+
+# Format code
+bun run format
+
 # Clean build artifacts
 bun run clean
 ```
@@ -108,9 +117,10 @@ bun run clean
 1. Fork the repository
 2. Create a feature branch: `git checkout -b feature/my-feature`
 3. Make your changes
-4. Run type check: `bun run type-check`
-5. Build: `bun run build`
-6. Test the extension thoroughly
-7. Commit: `git commit -am 'Add new feature'`
-8. Push: `git push origin feature/my-feature`
-9. Create a Pull Request
+4. Run lint: `bun run lint`
+5. Run type check: `bun run type-check`
+6. Build: `bun run build`
+7. Test the extension thoroughly
+8. Commit: `git commit -am 'Add new feature'`
+9. Push: `git push origin feature/my-feature`
+10. Create a Pull Request

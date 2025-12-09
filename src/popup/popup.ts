@@ -3,7 +3,6 @@ window.AUTH_CONFIG = window.AUTH_CONFIG || { apiBaseUrl: '' };
 const isAuthError = (error: any): boolean => {
   if (!error) return false;
 
-
   const message = error.message || error.error || String(error);
   const authPatterns = [
     /\b401\b/,
@@ -16,10 +15,14 @@ const isAuthError = (error: any): boolean => {
     /auth.*failed/i,
   ];
 
-  return authPatterns.some(pattern => pattern.test(message));
+  return authPatterns.some((pattern) => pattern.test(message));
 };
 
-const showPopupToast = (type: 'success' | 'error', title: string, message: string) => {
+const showPopupToast = (
+  type: 'success' | 'error',
+  title: string,
+  message: string,
+) => {
   const existingToast = document.querySelector('.toast');
   if (existingToast) {
     existingToast.remove();
@@ -56,9 +59,11 @@ const showPopupToast = (type: 'success' | 'error', title: string, message: strin
   }, 4000);
 };
 
-document.addEventListener('DOMContentLoaded', async function () {
+document.addEventListener('DOMContentLoaded', async () => {
   const form = document.getElementById('job-form') as HTMLFormElement;
-  const dashboardSelect = document.getElementById('dashboardName') as HTMLSelectElement;
+  const dashboardSelect = document.getElementById(
+    'dashboardName',
+  ) as HTMLSelectElement;
 
   if (!form || !dashboardSelect) return;
 
@@ -66,7 +71,10 @@ document.addEventListener('DOMContentLoaded', async function () {
   if (savedData.formData) {
     const formData = savedData.formData as SavedFormData;
     Object.keys(formData).forEach((id) => {
-      const element = document.getElementById(id) as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
+      const element = document.getElementById(id) as
+        | HTMLInputElement
+        | HTMLSelectElement
+        | HTMLTextAreaElement;
       if (element && formData[id as keyof SavedFormData]) {
         element.value = formData[id as keyof SavedFormData] || '';
       }
@@ -74,9 +82,14 @@ document.addEventListener('DOMContentLoaded', async function () {
   }
 
   form.addEventListener('input', async (e) => {
-    const target = e.target as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
+    const target = e.target as
+      | HTMLInputElement
+      | HTMLSelectElement
+      | HTMLTextAreaElement;
     if (target.id) {
-      const formData = (await chrome.storage.local.get('formData')).formData as SavedFormData || {};
+      const formData =
+        ((await chrome.storage.local.get('formData'))
+          .formData as SavedFormData) || {};
       formData[target.id as keyof SavedFormData] = target.value;
       await chrome.storage.local.set({ formData });
     }
@@ -84,7 +97,9 @@ document.addEventListener('DOMContentLoaded', async function () {
 
   dashboardSelect.addEventListener('change', async (e) => {
     const target = e.target as HTMLSelectElement;
-    const formData = (await chrome.storage.local.get('formData')).formData as SavedFormData || {};
+    const formData =
+      ((await chrome.storage.local.get('formData'))
+        .formData as SavedFormData) || {};
     formData.dashboardName = target.value;
     await chrome.storage.local.set({ formData });
   });
@@ -117,13 +132,18 @@ document.addEventListener('DOMContentLoaded', async function () {
         `;
       } catch (error) {
         console.error('Login failed:', error);
-        showPopupToast('error', 'Error', 'Failed to open web app. Please try again.');
+        showPopupToast(
+          'error',
+          'Error',
+          'Failed to open web app. Please try again.',
+        );
       }
     });
     return;
   }
 
-  dashboardSelect.innerHTML = '<option value="" disabled selected>Loading dashboards...</option>';
+  dashboardSelect.innerHTML =
+    '<option value="" disabled selected>Loading dashboards...</option>';
 
   try {
     const dashboards = await window.Auth.getUserDashboards();
@@ -142,14 +162,15 @@ document.addEventListener('DOMContentLoaded', async function () {
         .join('');
 
       const savedData = await chrome.storage.local.get('formData');
-      if (savedData.formData && savedData.formData.dashboardName) {
+      if (savedData.formData?.dashboardName) {
         dashboardSelect.value = savedData.formData.dashboardName;
       }
 
       form.style.display = 'block';
     } else {
       console.log('No dashboards found');
-      dashboardSelect.innerHTML = '<option value="" disabled selected>No dashboards found</option>';
+      dashboardSelect.innerHTML =
+        '<option value="" disabled selected>No dashboards found</option>';
     }
   } catch (error: any) {
     console.error('Error fetching dashboards:', error);
@@ -158,28 +179,47 @@ document.addEventListener('DOMContentLoaded', async function () {
       await window.Auth.logout();
       window.location.reload();
     } else {
-      dashboardSelect.innerHTML = '<option value="" disabled selected>Error loading dashboards</option>';
-      showPopupToast('error', 'Error', 'Failed to load dashboards. Please try again.');
+      dashboardSelect.innerHTML =
+        '<option value="" disabled selected>Error loading dashboards</option>';
+      showPopupToast(
+        'error',
+        'Error',
+        'Failed to load dashboards. Please try again.',
+      );
     }
   }
 
-  form.addEventListener('submit', async function (e) {
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const submitBtn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+    const submitBtn = form.querySelector(
+      'button[type="submit"]',
+    ) as HTMLButtonElement;
     const originalText = submitBtn.textContent;
     submitBtn.disabled = true;
     submitBtn.classList.add('loading');
     submitBtn.textContent = 'Saving...';
 
     const jobData: JobApplication = {
-      dashboard_id: (document.getElementById('dashboardName') as HTMLSelectElement).value.trim(),
-      company: (document.getElementById('company') as HTMLInputElement).value.trim(),
-      position: (document.getElementById('position') as HTMLInputElement).value.trim(),
-      location: (document.getElementById('location') as HTMLInputElement).value.trim(),
+      dashboard_id: (
+        document.getElementById('dashboardName') as HTMLSelectElement
+      ).value.trim(),
+      company: (
+        document.getElementById('company') as HTMLInputElement
+      ).value.trim(),
+      position: (
+        document.getElementById('position') as HTMLInputElement
+      ).value.trim(),
+      location: (
+        document.getElementById('location') as HTMLInputElement
+      ).value.trim(),
       url: (document.getElementById('url') as HTMLInputElement).value.trim(),
-      salary_range: (document.getElementById('salaryRange') as HTMLInputElement).value.trim(),
-      description: (document.getElementById('jobDescription') as HTMLTextAreaElement).value.trim(),
+      salary_range: (
+        document.getElementById('salaryRange') as HTMLInputElement
+      ).value.trim(),
+      description: (
+        document.getElementById('jobDescription') as HTMLTextAreaElement
+      ).value.trim(),
       status: 'saved',
       applied_date: null,
     };
@@ -205,7 +245,11 @@ document.addEventListener('DOMContentLoaded', async function () {
       const savedJob = await response.json();
       console.log('Job saved successfully:', savedJob);
 
-      showPopupToast('success', 'Success!', 'Job information saved successfully');
+      showPopupToast(
+        'success',
+        'Success!',
+        'Job information saved successfully',
+      );
 
       await chrome.storage.local.remove('formData');
       form.reset();
@@ -221,7 +265,9 @@ document.addEventListener('DOMContentLoaded', async function () {
 
   const modal = document.getElementById('createDashboardModal') as HTMLElement;
   const closeModal = modal?.querySelector('.close-modal') as HTMLElement;
-  const dashboardForm = document.getElementById('dashboard-form') as HTMLFormElement;
+  const dashboardForm = document.getElementById(
+    'dashboard-form',
+  ) as HTMLFormElement;
 
   if (closeModal) {
     closeModal.addEventListener('click', () => {
@@ -239,23 +285,30 @@ document.addEventListener('DOMContentLoaded', async function () {
     dashboardForm.addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      const submitBtn = dashboardForm.querySelector('button[type="submit"]') as HTMLButtonElement;
+      const submitBtn = dashboardForm.querySelector(
+        'button[type="submit"]',
+      ) as HTMLButtonElement;
       const originalText = submitBtn.textContent;
       submitBtn.disabled = true;
       submitBtn.classList.add('loading');
       submitBtn.textContent = 'Creating...';
 
-      const newDashboardName = (document.getElementById('newDashboardName') as HTMLInputElement).value.trim();
+      const newDashboardName = (
+        document.getElementById('newDashboardName') as HTMLInputElement
+      ).value.trim();
 
       try {
-        const response = await fetch(`${window.AUTH_CONFIG.apiBaseUrl}/dashboards/`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${(await chrome.storage.local.get('token')).token}`,
+        const response = await fetch(
+          `${window.AUTH_CONFIG.apiBaseUrl}/dashboards/`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${(await chrome.storage.local.get('token')).token}`,
+            },
+            body: JSON.stringify({ name: newDashboardName }),
           },
-          body: JSON.stringify({ name: newDashboardName }),
-        });
+        );
 
         if (!response.ok) throw new Error('Failed to create dashboard');
 
@@ -268,10 +321,18 @@ document.addEventListener('DOMContentLoaded', async function () {
         modal.style.display = 'none';
         dashboardForm.reset();
 
-        showPopupToast('success', 'Dashboard Created', `"${newDashboard.name}" has been created successfully`);
+        showPopupToast(
+          'success',
+          'Dashboard Created',
+          `"${newDashboard.name}" has been created successfully`,
+        );
       } catch (error) {
         console.error('Error creating dashboard:', error);
-        showPopupToast('error', 'Error', 'Failed to create dashboard. Please try again.');
+        showPopupToast(
+          'error',
+          'Error',
+          'Failed to create dashboard. Please try again.',
+        );
       } finally {
         submitBtn.disabled = false;
         submitBtn.classList.remove('loading');

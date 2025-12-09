@@ -12,8 +12,12 @@ class Workday extends JobSite {
   isJobPage(): Promise<boolean> {
     return new Promise((resolve) => {
       setTimeout(() => {
-        const hasJobDetails = document.querySelector('[data-automation-id="jobPostingDetails"]') !== null;
-        const isJobUrl = window.location.pathname.includes('/details/') || window.location.pathname.includes('/job/');
+        const hasJobDetails =
+          document.querySelector('[data-automation-id="jobPostingDetails"]') !==
+          null;
+        const isJobUrl =
+          window.location.pathname.includes('/details/') ||
+          window.location.pathname.includes('/job/');
         resolve(hasJobDetails || isJobUrl);
       }, 500);
     });
@@ -21,39 +25,39 @@ class Workday extends JobSite {
 
   convertWorkdayHtmlToText(element: Element): string {
     const clone = element.cloneNode(true) as Element;
-    clone.querySelectorAll('script, style, svg').forEach(el => el.remove());
-    clone.querySelectorAll('p').forEach(p => {
+    clone.querySelectorAll('script, style, svg').forEach((el) => el.remove());
+    clone.querySelectorAll('p').forEach((p) => {
       const text = p.textContent?.trim();
       if (text) {
-        p.textContent = text + '\n\n';
+        p.textContent = `${text}\n\n`;
       } else {
         p.remove();
       }
     });
 
-    clone.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach(heading => {
+    clone.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach((heading) => {
       const text = heading.textContent?.trim();
       if (text) {
-        heading.textContent = '\n' + text + '\n\n';
+        heading.textContent = `\n${text}\n\n`;
       }
     });
 
-    clone.querySelectorAll('li').forEach(li => {
+    clone.querySelectorAll('li').forEach((li) => {
       const text = li.textContent?.trim();
       if (text) {
         if (text.startsWith('•')) {
-          li.textContent = text + '\n';
+          li.textContent = `${text}\n`;
         } else {
-          li.textContent = '• ' + text + '\n';
+          li.textContent = `• ${text}\n`;
         }
       }
     });
 
-    clone.querySelectorAll('ul, ol').forEach(list => {
+    clone.querySelectorAll('ul, ol').forEach((list) => {
       list.insertAdjacentText('afterend', '\n');
     });
 
-    clone.querySelectorAll('br').forEach(br => {
+    clone.querySelectorAll('br').forEach((br) => {
       br.insertAdjacentText('beforebegin', '\n');
     });
 
@@ -67,39 +71,46 @@ class Workday extends JobSite {
     return text;
   }
   extractJobDetails(): JobDetails {
-    const selectors = this.getSelectors();
+    const _selectors = this.getSelectors();
 
-    let company = "";
-    const canonicalLink = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
-    if (canonicalLink && canonicalLink.href) {
+    let company = '';
+    const canonicalLink = document.querySelector(
+      'link[rel="canonical"]',
+    ) as HTMLLinkElement;
+    if (canonicalLink?.href) {
       const hostname = new URL(canonicalLink.href).hostname;
       const match = hostname.match(/^([^.]+)\.wd\d+\.myworkdayjobs\.com$/);
-      if (match && match[1]) {
+      if (match?.[1]) {
         company = match[1].charAt(0).toUpperCase() + match[1].slice(1);
       }
     }
     if (!company) {
       const hostname = window.location.hostname;
       const match = hostname.match(/^([^.]+)\.wd\d+\.myworkdayjobs\.com$/);
-      if (match && match[1]) {
+      if (match?.[1]) {
         company = match[1].charAt(0).toUpperCase() + match[1].slice(1);
       }
     }
     if (!company) {
-      const companyElement = document.querySelector('[data-automation-id="breadcrumbs"] a');
+      const companyElement = document.querySelector(
+        '[data-automation-id="breadcrumbs"] a',
+      );
       if (companyElement) {
-        company = companyElement.textContent?.trim() || "";
+        company = companyElement.textContent?.trim() || '';
       }
     }
 
-    const titleElement = document.querySelector('[data-automation-id="jobPostingHeader"]');
-    const position = titleElement?.textContent?.trim() || "";
+    const titleElement = document.querySelector(
+      '[data-automation-id="jobPostingHeader"]',
+    );
+    const position = titleElement?.textContent?.trim() || '';
 
-    let location = "";
-    const locationElement = document.querySelector('[data-automation-id="locations"]') ||
-                           document.querySelector('[data-automation-id="location"]');
+    let location = '';
+    const locationElement =
+      document.querySelector('[data-automation-id="locations"]') ||
+      document.querySelector('[data-automation-id="location"]');
     if (locationElement) {
-      let rawLocation = locationElement.textContent?.trim() || "";
+      let rawLocation = locationElement.textContent?.trim() || '';
       rawLocation = rawLocation
         .replace(/^locations?/i, '')
         .replace(/^:/, '')
@@ -108,17 +119,20 @@ class Workday extends JobSite {
       location = rawLocation;
     }
 
-    let description = "";
-    const descriptionElement = document.querySelector('[data-automation-id="jobPostingDescription"]');
+    let description = '';
+    const descriptionElement = document.querySelector(
+      '[data-automation-id="jobPostingDescription"]',
+    );
     if (descriptionElement) {
       description = this.convertWorkdayHtmlToText(descriptionElement);
     }
 
-    let salaryRange = "";
-    const salaryElement = document.querySelector('[data-automation-id="compensationRange"]') ||
-                         document.querySelector('[data-automation-id="salary"]');
+    let salaryRange = '';
+    const salaryElement =
+      document.querySelector('[data-automation-id="compensationRange"]') ||
+      document.querySelector('[data-automation-id="salary"]');
     if (salaryElement) {
-      salaryRange = salaryElement.textContent?.trim() || "";
+      salaryRange = salaryElement.textContent?.trim() || '';
     }
 
     return {

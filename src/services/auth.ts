@@ -30,7 +30,10 @@ class Auth implements AuthService {
                 return true;
               }
             } catch (scriptError) {
-              console.log('Could not access web app localStorage:', scriptError);
+              console.log(
+                'Could not access web app localStorage:',
+                scriptError,
+              );
             }
           }
         }
