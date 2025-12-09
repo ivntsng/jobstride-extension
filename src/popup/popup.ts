@@ -1,5 +1,24 @@
 window.AUTH_CONFIG = window.AUTH_CONFIG || { apiBaseUrl: '' };
 
+const isAuthError = (error: any): boolean => {
+  if (!error) return false;
+
+
+  const message = error.message || error.error || String(error);
+  const authPatterns = [
+    /\b401\b/,
+    /\b403\b/,
+    /unauthorized/i,
+    /unauthenticated/i,
+    /forbidden/i,
+    /invalid.?token/i,
+    /token.?expired/i,
+    /auth.*failed/i,
+  ];
+
+  return authPatterns.some(pattern => pattern.test(message));
+};
+
 const showPopupToast = (type: 'success' | 'error', title: string, message: string) => {
   const existingToast = document.querySelector('.toast');
   if (existingToast) {
@@ -73,22 +92,34 @@ document.addEventListener('DOMContentLoaded', async function () {
   const isAuthenticated = await window.Auth.checkAuthStatus();
   if (!isAuthenticated) {
     form.style.display = 'none';
-    const loginButton = document.createElement('button');
-    loginButton.textContent = 'Login with GitHub';
-    loginButton.className = 'btn-primary';
-    loginButton.onclick = async () => {
+    const loginContainer = document.createElement('div');
+    loginContainer.style.cssText = 'text-align: center; padding: 20px;';
+    loginContainer.innerHTML = `
+      <h2 style="margin-bottom: 15px; font-size: 18px;">Login Required</h2>
+      <p style="margin-bottom: 20px; color: #666; font-size: 14px;">
+        Please visit the NextStep web app to log in with GitHub, then reopen this extension.
+      </p>
+      <button id="open-web-app" class="btn-primary" style="margin-bottom: 10px;">Open NextStep Web App</button>
+    `;
+    document.querySelector('.card')?.appendChild(loginContainer);
+
+    const openWebAppBtn = document.getElementById('open-web-app');
+    openWebAppBtn?.addEventListener('click', async () => {
       try {
-        const token = await window.Auth.initiateGithubLogin();
-        if (token) {
-          await chrome.storage.local.set({ token });
-          window.location.reload();
-        }
+        await window.Auth.openWebAppLogin();
+        // Show success message after opening the tab
+        loginContainer.innerHTML = `
+          <h2 style="margin-bottom: 15px; font-size: 18px; color: #10b981;">✓ Tab Opened</h2>
+          <p style="margin-bottom: 20px; color: #666; font-size: 14px;">
+            Please log in to NextStep in the new tab, then reopen this extension.
+          </p>
+          <button class="btn-primary" onclick="window.close()">Close</button>
+        `;
       } catch (error) {
         console.error('Login failed:', error);
-        showPopupToast('error', 'Login Failed', 'Please try again.');
+        showPopupToast('error', 'Error', 'Failed to open web app. Please try again.');
       }
-    };
-    document.querySelector('.card')?.appendChild(loginButton);
+    });
     return;
   }
 
@@ -97,7 +128,15 @@ document.addEventListener('DOMContentLoaded', async function () {
   try {
     const dashboards = await window.Auth.getUserDashboards();
     console.log('Received dashboards:', dashboards);
-    if (dashboards?.length) {
+
+    if (dashboards === null) {
+      // User is not authenticated, log them out and show login
+      await window.Auth.logout();
+      window.location.reload();
+      return;
+    }
+
+    if (dashboards.length > 0) {
       dashboardSelect.innerHTML = dashboards
         .map((d: Dashboard) => `<option value="${d.id}">${d.name}</option>`)
         .join('');
@@ -109,12 +148,19 @@ document.addEventListener('DOMContentLoaded', async function () {
 
       form.style.display = 'block';
     } else {
-      console.log('No dashboards found or dashboards is null');
+      console.log('No dashboards found');
       dashboardSelect.innerHTML = '<option value="" disabled selected>No dashboards found</option>';
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching dashboards:', error);
-    dashboardSelect.innerHTML = '<option value="" disabled selected>Error loading dashboards</option>';
+    // If there's an authentication error, log out and force re-login
+    if (isAuthError(error)) {
+      await window.Auth.logout();
+      window.location.reload();
+    } else {
+      dashboardSelect.innerHTML = '<option value="" disabled selected>Error loading dashboards</option>';
+      showPopupToast('error', 'Error', 'Failed to load dashboards. Please try again.');
+    }
   }
 
   form.addEventListener('submit', async function (e) {

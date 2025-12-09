@@ -95,12 +95,12 @@ interface Window {
     apiBaseUrl: string;
     webAppUrl?: string;
   };
-  Auth: {
-    checkAuthStatus(): Promise<boolean>;
-    getUserDashboards(): Promise<Dashboard[] | null>;
-    initiateGithubLogin(): Promise<string>;
-    handleGithubCallback(code: string): Promise<string>;
-  };
+    Auth: {
+      checkAuthStatus(): Promise<boolean>;
+      getUserDashboards(): Promise<Dashboard[] | null>;
+      openWebAppLogin(): Promise<void>;
+      logout(): Promise<void>;
+    };
   JobSite: any;
   Indeed: any;
   LinkedIn: any;
