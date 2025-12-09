@@ -81,11 +81,6 @@ class Indeed extends JobSite {
       );
     }
 
-    // Log what we found for debugging
-    console.log('Company element found:', elements.company);
-    console.log('Location element found:', elements.location);
-    console.log('Location text:', elements.location?.textContent);
-
     return {
       company: elements.company?.textContent?.trim() || '',
       position: elements.title?.textContent?.trim() || '',

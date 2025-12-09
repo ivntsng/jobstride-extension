@@ -6,10 +6,7 @@
     "useIgnoreFile": true
   },
   "files": {
-    "includes": [
-      "**",
-      "!!**/dist"
-    ]
+    "includes": ["**", "!!**/dist", "!!build.js"]
   },
   "formatter": {
     "enabled": true,
@@ -23,7 +20,8 @@
       "suspicious": {
         "noExplicitAny": "off",
         "useIterableCallbackReturn": "off",
-        "noDuplicateProperties": "warn"
+        "noDuplicateProperties": "warn",
+        "noConsole": "error"
       },
       "correctness": {
         "noUnusedFunctionParameters": "warn"

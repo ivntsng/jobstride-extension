@@ -25,7 +25,6 @@ async function handleFetchRequest(
     const data = await response.json();
     return { success: true, data };
   } catch (error) {
-    console.error('Fetch request failed:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',

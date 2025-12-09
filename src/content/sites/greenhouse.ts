@@ -16,11 +16,6 @@ class Greenhouse extends JobSite {
         const isJobPage =
           document.querySelector(selectors.jobPage) !== null ||
           window.location.pathname.includes('/embed/job_app');
-        console.log('DOM elements found:', {
-          jobPage: document.querySelector(selectors.jobPage),
-          content: document.querySelector(selectors.description),
-          pathname: window.location.pathname,
-        });
         resolve(isJobPage);
       }, 500);
     });

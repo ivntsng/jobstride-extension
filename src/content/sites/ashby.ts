@@ -75,8 +75,8 @@ class Ashby extends JobSite {
           jsonLdData = parsedData;
           break;
         }
-      } catch (error) {
-        console.error('Error parsing JSON-LD data:', error);
+      } catch (_error) {
+        // Failed to parse JSON-LD data, continue to next script
       }
     }
 
@@ -149,11 +149,7 @@ class Ashby extends JobSite {
     if (jsonLdData?.description) {
       try {
         jobDescription = window.Utils.convertHtmlToText(jsonLdData.description);
-      } catch (error) {
-        console.error(
-          'Error converting JSON-LD description HTML to text:',
-          error,
-        );
+      } catch (_error) {
         jobDescription = jsonLdData.description.replace(/<[^>]*>/g, '').trim();
       }
     }
@@ -177,8 +173,7 @@ class Ashby extends JobSite {
           jobDescription = window.Utils.convertHtmlToText(
             descriptionElement.innerHTML,
           );
-        } catch (error) {
-          console.error('Error converting description HTML to text:', error);
+        } catch (_error) {
           jobDescription = descriptionElement.textContent || '';
         }
       }

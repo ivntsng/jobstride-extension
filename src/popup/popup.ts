@@ -130,8 +130,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           </p>
           <button class="btn-primary" onclick="window.close()">Close</button>
         `;
-      } catch (error) {
-        console.error('Login failed:', error);
+      } catch (_error) {
         showPopupToast(
           'error',
           'Error',
@@ -147,7 +146,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   try {
     const dashboards = await window.Auth.getUserDashboards();
-    console.log('Received dashboards:', dashboards);
 
     if (dashboards === null) {
       // User is not authenticated, log them out and show login
@@ -168,12 +166,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       form.style.display = 'block';
     } else {
-      console.log('No dashboards found');
       dashboardSelect.innerHTML =
         '<option value="" disabled selected>No dashboards found</option>';
     }
   } catch (error: any) {
-    console.error('Error fetching dashboards:', error);
     // If there's an authentication error, log out and force re-login
     if (isAuthError(error)) {
       await window.Auth.logout();
@@ -237,13 +233,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
 
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Error response:', errorText);
         throw new Error('Failed to save job');
       }
 
-      const savedJob = await response.json();
-      console.log('Job saved successfully:', savedJob);
+      await response.json();
 
       showPopupToast(
         'success',
@@ -253,8 +246,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       await chrome.storage.local.remove('formData');
       form.reset();
-    } catch (error) {
-      console.error('Error saving job:', error);
+    } catch (_error) {
       showPopupToast('error', 'Error', 'Failed to save job. Please try again.');
     } finally {
       submitBtn.disabled = false;
@@ -326,8 +318,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           'Dashboard Created',
           `"${newDashboard.name}" has been created successfully`,
         );
-      } catch (error) {
-        console.error('Error creating dashboard:', error);
+      } catch (_error) {
         showPopupToast(
           'error',
           'Error',

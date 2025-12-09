@@ -90,7 +90,6 @@ async function initializeModalFunctionality(modal: HTMLElement): Promise<void> {
         '<option value="" disabled selected>No dashboards found</option>';
     }
   } catch (error: any) {
-    console.error('Error fetching dashboards:', error);
     dashboardSelect.innerHTML = `<option value="" disabled selected>Error: ${error.message || 'loading dashboards'}</option>`;
   }
 
@@ -176,15 +175,13 @@ async function initializeModalFunctionality(modal: HTMLElement): Promise<void> {
         throw new Error(response.error || 'Failed to save job');
       }
 
-      console.log('Job saved successfully:', response.data);
       showContentToast(
         'success',
         'Success!',
         'Job information saved successfully',
       );
       (modal as HTMLElement).style.display = 'none';
-    } catch (error) {
-      console.error('Error saving job:', error);
+    } catch (_error) {
       showContentToast(
         'error',
         'Error',
@@ -274,7 +271,6 @@ function createFloatingButton(jobSite: JobSite): void {
     return;
   }
 
-  console.log('Creating floating button...');
   const button = document.createElement('button');
   button.id = 'job-tracker-btn';
   button.textContent = 'Track This Job';
@@ -284,7 +280,6 @@ function createFloatingButton(jobSite: JobSite): void {
 
   button.addEventListener('click', () => {
     const jobDetails = jobSite.extractJobDetails();
-    console.log('Extracted job details:', jobDetails);
 
     (modal.querySelector('#position') as HTMLInputElement).value =
       jobDetails.position || '';
@@ -322,8 +317,6 @@ function createFloatingButton(jobSite: JobSite): void {
 function initializeJobTracker(): void {
   let jobSite: JobSite | null = null;
   const hostname = window.location.hostname;
-
-  console.log('Initializing job tracker for:', hostname);
 
   const JOB_SITE_CONFIG: Record<string, SiteConfig> = {
     greenhouse: {
@@ -376,11 +369,10 @@ function initializeJobTracker(): void {
   }
 
   if (jobSite) {
-    console.log('Job site handler created:', jobSite.constructor.name);
-    jobSite.isJobPage().then((isJobPage) => {
-      console.log('Is job page:', isJobPage);
+    const site = jobSite;
+    site.isJobPage().then((isJobPage) => {
       if (isJobPage) {
-        createFloatingButton(jobSite!);
+        createFloatingButton(site);
       }
     });
   }
