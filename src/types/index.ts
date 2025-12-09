@@ -99,8 +99,8 @@ declare global {
     Auth: {
       checkAuthStatus(): Promise<boolean>;
       getUserDashboards(): Promise<Dashboard[] | null>;
-      initiateGithubLogin(): Promise<string>;
-      handleGithubCallback(code: string): Promise<string>;
+      openWebAppLogin(): Promise<void>;
+      logout(): Promise<void>;
     };
     createModalForm: () => HTMLElement;
     convertHtmlToText: (html: string) => string;

@@ -62,7 +62,13 @@ async function initializeModalFunctionality(modal: HTMLElement): Promise<void> {
   try {
     const dashboards = await window.Auth.getUserDashboards();
 
-    if (dashboards?.length) {
+    if (dashboards === null) {
+      dashboardSelect.innerHTML =
+        '<option value="" disabled selected>Please login to extension</option>';
+      return;
+    }
+
+    if (dashboards.length) {
       dashboardSelect.innerHTML =
         '<option value="" disabled>Select a dashboard...</option>' +
         dashboards
@@ -74,10 +80,10 @@ async function initializeModalFunctionality(modal: HTMLElement): Promise<void> {
       dashboardSelect.innerHTML =
         '<option value="" disabled selected>No dashboards found</option>';
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching dashboards:', error);
     dashboardSelect.innerHTML =
-      '<option value="" disabled selected>Error loading dashboards</option>';
+      `<option value="" disabled selected>Error: ${error.message || 'loading dashboards'}</option>`;
   }
 
   form.addEventListener('submit', async function (e) {
