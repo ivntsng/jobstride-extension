@@ -1,8 +1,12 @@
 window.AUTH_CONFIG = window.AUTH_CONFIG || { apiBaseUrl: '' };
 
-let currentToken: string | null = null;
+let _currentToken: string | null = null;
 
-const showContentToast = (type: 'success' | 'error', title: string, message: string) => {
+const showContentToast = (
+  type: 'success' | 'error',
+  title: string,
+  message: string,
+) => {
   const existingToast = document.querySelector('.job-tracker-toast');
   if (existingToast) {
     existingToast.remove();
@@ -38,26 +42,31 @@ const showContentToast = (type: 'success' | 'error', title: string, message: str
   }, 4000);
 };
 
-chrome.runtime.onMessage.addListener((message: ChromeMessage, sender, sendResponse) => {
-  if (message.type === 'AUTH_STATE_CHANGED') {
-    currentToken = message.token || null;
-    const modal = document.getElementById('job-tracker-modal');
-    if (modal) {
-      initializeModalFunctionality(modal);
+chrome.runtime.onMessage.addListener(
+  (message: ChromeMessage, _sender, _sendResponse) => {
+    if (message.type === 'AUTH_STATE_CHANGED') {
+      _currentToken = message.token || null;
+      const modal = document.getElementById('job-tracker-modal');
+      if (modal) {
+        initializeModalFunctionality(modal);
+      }
     }
-  }
-});
+  },
+);
 
 /*******************************
  *  Modal Functionality
  *******************************/
 async function initializeModalFunctionality(modal: HTMLElement): Promise<void> {
   const form = modal.querySelector('#job-form-modal') as HTMLFormElement;
-  const dashboardSelect = modal.querySelector('#dashboardName') as HTMLSelectElement;
+  const dashboardSelect = modal.querySelector(
+    '#dashboardName',
+  ) as HTMLSelectElement;
 
   if (!form || !dashboardSelect) return;
 
-  dashboardSelect.innerHTML = '<option value="" disabled selected>Loading dashboards...</option>';
+  dashboardSelect.innerHTML =
+    '<option value="" disabled selected>Loading dashboards...</option>';
 
   try {
     const dashboards = await window.Auth.getUserDashboards();
@@ -81,15 +90,15 @@ async function initializeModalFunctionality(modal: HTMLElement): Promise<void> {
         '<option value="" disabled selected>No dashboards found</option>';
     }
   } catch (error: any) {
-    console.error('Error fetching dashboards:', error);
-    dashboardSelect.innerHTML =
-      `<option value="" disabled selected>Error: ${error.message || 'loading dashboards'}</option>`;
+    dashboardSelect.innerHTML = `<option value="" disabled selected>Error: ${error.message || 'loading dashboards'}</option>`;
   }
 
-  form.addEventListener('submit', async function (e) {
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const submitBtn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+    const submitBtn = form.querySelector(
+      'button[type="submit"]',
+    ) as HTMLButtonElement;
     const originalText = submitBtn.textContent;
     submitBtn.disabled = true;
     submitBtn.classList.add('loading');
@@ -101,18 +110,34 @@ async function initializeModalFunctionality(modal: HTMLElement): Promise<void> {
       const token = tokenData.token;
 
       if (!token) {
-        showContentToast('error', 'Authentication Required', 'Please login first');
+        showContentToast(
+          'error',
+          'Authentication Required',
+          'Please login first',
+        );
         return;
       }
 
       const jobData: JobApplication = {
-        dashboard_id: (document.getElementById('dashboardName') as HTMLSelectElement).value.trim(),
-        company: (document.getElementById('company') as HTMLInputElement).value.trim(),
-        position: (document.getElementById('position') as HTMLInputElement).value.trim(),
-        location: (document.getElementById('location') as HTMLInputElement).value.trim(),
+        dashboard_id: (
+          document.getElementById('dashboardName') as HTMLSelectElement
+        ).value.trim(),
+        company: (
+          document.getElementById('company') as HTMLInputElement
+        ).value.trim(),
+        position: (
+          document.getElementById('position') as HTMLInputElement
+        ).value.trim(),
+        location: (
+          document.getElementById('location') as HTMLInputElement
+        ).value.trim(),
         url: (document.getElementById('url') as HTMLInputElement).value.trim(),
-        salary_range: (document.getElementById('salaryRange') as HTMLInputElement).value.trim(),
-        description: (document.getElementById('jobDescription') as HTMLTextAreaElement).value.trim(),
+        salary_range: (
+          document.getElementById('salaryRange') as HTMLInputElement
+        ).value.trim(),
+        description: (
+          document.getElementById('jobDescription') as HTMLTextAreaElement
+        ).value.trim(),
         status: 'saved',
         applied_date: null,
       };
@@ -139,19 +164,29 @@ async function initializeModalFunctionality(modal: HTMLElement): Promise<void> {
         ) {
           // Trigger a re-login or token refresh
           await chrome.runtime.sendMessage({ type: 'REFRESH_TOKEN' });
-          showContentToast('error', 'Session Expired', 'Your session has expired. Please login again.');
+          showContentToast(
+            'error',
+            'Session Expired',
+            'Your session has expired. Please login again.',
+          );
           return;
         }
 
         throw new Error(response.error || 'Failed to save job');
       }
 
-      console.log('Job saved successfully:', response.data);
-      showContentToast('success', 'Success!', 'Job information saved successfully');
+      showContentToast(
+        'success',
+        'Success!',
+        'Job information saved successfully',
+      );
       (modal as HTMLElement).style.display = 'none';
-    } catch (error) {
-      console.error('Error saving job:', error);
-      showContentToast('error', 'Error', 'Failed to save job. Please try again.');
+    } catch (_error) {
+      showContentToast(
+        'error',
+        'Error',
+        'Failed to save job. Please try again.',
+      );
     } finally {
       // Reset button state
       submitBtn.disabled = false;
@@ -173,8 +208,15 @@ function convertHtmlToText(html: string): string {
   });
 
   const blockElements = [
-    'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-    'p', 'div', 'section',
+    'h1',
+    'h2',
+    'h3',
+    'h4',
+    'h5',
+    'h6',
+    'p',
+    'div',
+    'section',
   ];
   blockElements.forEach((tag) => {
     tempDiv.querySelectorAll(tag).forEach((el) => {
@@ -206,18 +248,19 @@ function convertHtmlToText(html: string): string {
     br.insertAdjacentText('beforebegin', '\n');
   });
 
-  let text = tempDiv.textContent
-    ?.replace(/\t+/g, ' ')
-    .replace(/\r?\n/g, '\n')
-    .replace(/[ ]{2,}/g, ' ')
-    .split('\n')
-    .map((line) => line.trim())
-    .filter((line) => line.length > 0)
-    .filter((line) => line !== '•')
-    .join('\n\n')
-    .replace(/\n{3,}/g, '\n\n')
-    .replace(/•\s*•/g, '•')
-    .trim() || '';
+  const text =
+    tempDiv.textContent
+      ?.replace(/\t+/g, ' ')
+      .replace(/\r?\n/g, '\n')
+      .replace(/[ ]{2,}/g, ' ')
+      .split('\n')
+      .map((line) => line.trim())
+      .filter((line) => line.length > 0)
+      .filter((line) => line !== '•')
+      .join('\n\n')
+      .replace(/\n{3,}/g, '\n\n')
+      .replace(/•\s*•/g, '•')
+      .trim() || '';
   return text;
 }
 
@@ -228,7 +271,6 @@ function createFloatingButton(jobSite: JobSite): void {
     return;
   }
 
-  console.log('Creating floating button...');
   const button = document.createElement('button');
   button.id = 'job-tracker-btn';
   button.textContent = 'Track This Job';
@@ -236,26 +278,31 @@ function createFloatingButton(jobSite: JobSite): void {
 
   const modal = window.createModalForm();
 
-  button.addEventListener('click', function () {
+  button.addEventListener('click', () => {
     const jobDetails = jobSite.extractJobDetails();
-    console.log('Extracted job details:', jobDetails);
 
-    (modal.querySelector('#position') as HTMLInputElement).value = jobDetails.position || '';
-    (modal.querySelector('#company') as HTMLInputElement).value = jobDetails.company || '';
-    (modal.querySelector('#location') as HTMLInputElement).value = jobDetails.location || '';
-    (modal.querySelector('#url') as HTMLInputElement).value = jobDetails.url || '';
-    (modal.querySelector('#jobDescription') as HTMLTextAreaElement).value = jobDetails.jobDescription || '';
-    (modal.querySelector('#salaryRange') as HTMLInputElement).value = jobDetails.salaryRange || '';
+    (modal.querySelector('#position') as HTMLInputElement).value =
+      jobDetails.position || '';
+    (modal.querySelector('#company') as HTMLInputElement).value =
+      jobDetails.company || '';
+    (modal.querySelector('#location') as HTMLInputElement).value =
+      jobDetails.location || '';
+    (modal.querySelector('#url') as HTMLInputElement).value =
+      jobDetails.url || '';
+    (modal.querySelector('#jobDescription') as HTMLTextAreaElement).value =
+      jobDetails.jobDescription || '';
+    (modal.querySelector('#salaryRange') as HTMLInputElement).value =
+      jobDetails.salaryRange || '';
 
     modal.style.display = 'block';
   });
 
   const closeBtn = modal.querySelector('.close') as HTMLElement;
-  closeBtn.onclick = function () {
+  closeBtn.onclick = () => {
     modal.style.display = 'none';
   };
 
-  window.onclick = function (event: MouseEvent) {
+  window.onclick = (event: MouseEvent) => {
     if (event.target === modal) {
       modal.style.display = 'none';
     }
@@ -270,8 +317,6 @@ function createFloatingButton(jobSite: JobSite): void {
 function initializeJobTracker(): void {
   let jobSite: JobSite | null = null;
   const hostname = window.location.hostname;
-
-  console.log('Initializing job tracker for:', hostname);
 
   const JOB_SITE_CONFIG: Record<string, SiteConfig> = {
     greenhouse: {
@@ -312,7 +357,7 @@ function initializeJobTracker(): void {
   };
 
   const matchingSite = Object.entries(JOB_SITE_CONFIG).find(([_, config]) =>
-    config.domains.some((domain) => hostname.includes(domain))
+    config.domains.some((domain) => hostname.includes(domain)),
   )?.[0];
 
   if (matchingSite) {
@@ -324,11 +369,10 @@ function initializeJobTracker(): void {
   }
 
   if (jobSite) {
-    console.log('Job site handler created:', jobSite.constructor.name);
-    jobSite.isJobPage().then((isJobPage) => {
-      console.log('Is job page:', isJobPage);
+    const site = jobSite;
+    site.isJobPage().then((isJobPage) => {
       if (isJobPage) {
-        createFloatingButton(jobSite!);
+        createFloatingButton(site);
       }
     });
   }
@@ -345,13 +389,13 @@ const observer = new MutationObserver((mutations) => {
       const element = node as Element;
       return (
         element.matches?.(
-          '.job-view-layout, .jobs-search__job-details, .job-details-jobs-container, .jobsearch-ViewJobLayout-jobDisplay, .job-posting, .ashby-job-posting, .ashby-job-posting-header, ._container_ud4nd_29, [data-automation-id="jobPostingDetails"], [data-testid="breadcrumb"], .ATS_htmlPreview'
+          '.job-view-layout, .jobs-search__job-details, .job-details-jobs-container, .jobsearch-ViewJobLayout-jobDisplay, .job-posting, .ashby-job-posting, .ashby-job-posting-header, ._container_ud4nd_29, [data-automation-id="jobPostingDetails"], [data-testid="breadcrumb"], .ATS_htmlPreview',
         ) ||
         element.querySelector?.(
-          '.job-view-layout, .jobs-search__job-details, .job-details-jobs-container, .jobsearch-ViewJobLayout-jobDisplay, .job-posting, .ashby-job-posting, .ashby-job-posting-header, ._container_ud4nd_29, [data-automation-id="jobPostingDetails"], [data-testid="breadcrumb"], .ATS_htmlPreview'
+          '.job-view-layout, .jobs-search__job-details, .job-details-jobs-container, .jobsearch-ViewJobLayout-jobDisplay, .job-posting, .ashby-job-posting, .ashby-job-posting-header, ._container_ud4nd_29, [data-automation-id="jobPostingDetails"], [data-testid="breadcrumb"], .ATS_htmlPreview',
         )
       );
-    })
+    }),
   );
 
   if (relevantChange) {

@@ -7,11 +7,11 @@ function createPopup(): void {
   });
 }
 
-chrome.action.onClicked.addListener((tab) => {
+chrome.action.onClicked.addListener((_tab) => {
   createPopup();
 });
 
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message.type === 'OPEN_POPUP') {
     createPopup();
     sendResponse({ success: true });

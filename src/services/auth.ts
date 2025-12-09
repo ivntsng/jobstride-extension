@@ -29,86 +29,67 @@ class Auth implements AuthService {
                 await chrome.storage.local.set({ token: token[0].result });
                 return true;
               }
-            } catch (scriptError) {
-              console.log('Could not access web app localStorage:', scriptError);
+            } catch (_scriptError) {
+              // Could not access web app localStorage
             }
           }
         }
       }
 
       return false;
-    } catch (error) {
-      console.error('Error checking auth status:', error);
+    } catch (_error) {
       return false;
     }
   }
 
   async getUserDashboards(): Promise<any[] | null> {
-    try {
-      const chromeToken = await chrome.storage.local.get('token');
-      console.log('Retrieved token:', chromeToken.token ? 'exists' : 'missing');
+    const chromeToken = await chrome.storage.local.get('token');
 
-      if (!chromeToken.token) {
-        return null;
-      }
-
-      return await new Promise<any[]>((resolve, reject) => {
-        const message = {
-          type: 'FETCH_REQUEST',
-          config: {
-            url: `${(window as any).AUTH_CONFIG.apiBaseUrl}/dashboards/`,
-            method: 'GET',
-            headers: {
-              Authorization: `Bearer ${chromeToken.token}`,
-              'Content-Type': 'application/json',
-              Accept: 'application/json',
-            },
-          },
-        };
-
-        chrome.runtime.sendMessage(message, (response: any) => {
-          if (chrome.runtime.lastError) {
-            console.error('Runtime error:', chrome.runtime.lastError);
-            reject(chrome.runtime.lastError);
-          } else if (!response || !response.success) {
-            reject(new Error(response?.error || 'Failed to fetch dashboards'));
-          } else {
-            resolve(response.data || []);
-          }
-        });
-      });
-    } catch (error) {
-      console.error('Error fetching dashboards:', error);
-      throw error;
+    if (!chromeToken.token) {
+      return null;
     }
+
+    return await new Promise<any[]>((resolve, reject) => {
+      const message = {
+        type: 'FETCH_REQUEST',
+        config: {
+          url: `${(window as any).AUTH_CONFIG.apiBaseUrl}/dashboards/`,
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${chromeToken.token}`,
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+        },
+      };
+
+      chrome.runtime.sendMessage(message, (response: any) => {
+        if (chrome.runtime.lastError) {
+          reject(chrome.runtime.lastError);
+        } else if (!response || !response.success) {
+          reject(new Error(response?.error || 'Failed to fetch dashboards'));
+        } else {
+          resolve(response.data || []);
+        }
+      });
+    });
   }
 
   async openWebAppLogin(): Promise<void> {
-    try {
-      const webAppUrl = (window as any).AUTH_CONFIG?.webAppUrl;
-      if (!webAppUrl) {
-        throw new Error('Web app URL not configured');
-      }
+    const webAppUrl = (window as any).AUTH_CONFIG?.webAppUrl;
+    if (!webAppUrl) {
+      throw new Error('Web app URL not configured');
+    }
 
-      if (chrome.tabs) {
-        await chrome.tabs.create({ url: webAppUrl });
-      } else {
-        window.open(webAppUrl, '_blank');
-      }
-    } catch (error) {
-      console.error('Failed to open web app login:', error);
-      throw error;
+    if (chrome.tabs) {
+      await chrome.tabs.create({ url: webAppUrl });
+    } else {
+      window.open(webAppUrl, '_blank');
     }
   }
 
   async logout(): Promise<void> {
-    try {
-      await chrome.storage.local.remove('token');
-      console.log('User logged out successfully');
-    } catch (error) {
-      console.error('Error during logout:', error);
-      throw error;
-    }
+    await chrome.storage.local.remove('token');
   }
 }
 

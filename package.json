@@ -7,10 +7,14 @@
     "build:watch": "tsc --watch",
     "dev": "tsc --watch",
     "clean": "rm -rf dist",
-    "prebuild": "pnpm run clean",
-    "type-check": "tsc --noEmit"
+    "prebuild": "bun run clean",
+    "type-check": "tsc --noEmit",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "format": "biome format --write ."
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.3.8",
     "@types/chrome": "^0.0.254",
     "typescript": "^5.3.0"
   },

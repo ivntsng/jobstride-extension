@@ -77,14 +77,9 @@ class Indeed extends JobSite {
     let jobDescription = '';
     if (elements.description) {
       jobDescription = window.Utils.convertHtmlToMarkdown(
-        elements.description.innerHTML
+        elements.description.innerHTML,
       );
     }
-
-    // Log what we found for debugging
-    console.log('Company element found:', elements.company);
-    console.log('Location element found:', elements.location);
-    console.log('Location text:', elements.location?.textContent);
 
     return {
       company: elements.company?.textContent?.trim() || '',

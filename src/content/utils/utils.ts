@@ -1,6 +1,6 @@
 const Utils = {
-  convertHtmlToMarkdown: function (html: string): string {
-    return html
+  convertHtmlToMarkdown: (html: string): string =>
+    html
       .replace(/<h2[^>]*>/g, '\n## ')
       .replace(/<\/h2>/g, '\n\n')
       .replace(/<ul[^>]*>/g, '')
@@ -16,10 +16,9 @@ const Utils = {
       .replace(/<!--.*?-->/g, '')
       .replace(/\n{3,}/g, '\n\n')
       .replace(/^\s+|\s+$/gm, '')
-      .trim();
-  },
+      .trim(),
 
-  convertHtmlToText: function (html: string): string {
+  convertHtmlToText: (html: string): string => {
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = html;
 
@@ -28,8 +27,15 @@ const Utils = {
     });
 
     const blockElements = [
-      'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-      'p', 'div', 'section',
+      'h1',
+      'h2',
+      'h3',
+      'h4',
+      'h5',
+      'h6',
+      'p',
+      'div',
+      'section',
     ];
     blockElements.forEach((tag) => {
       tempDiv.querySelectorAll(tag).forEach((el) => {
@@ -57,15 +63,16 @@ const Utils = {
     });
 
     // Extract and clean text
-    let text = tempDiv.textContent
-      ?.replace(/\t+/g, ' ')
-      .replace(/\r?\n/g, '\n')
-      .replace(/[ ]{2,}/g, ' ')
-      .split('\n')
-      .map((line) => line.trim())
-      .filter((line) => line.length > 0)
-      .join('\n\n')
-      .replace(/\n{3,}/g, '\n\n') || '';
+    const text =
+      tempDiv.textContent
+        ?.replace(/\t+/g, ' ')
+        .replace(/\r?\n/g, '\n')
+        .replace(/[ ]{2,}/g, ' ')
+        .split('\n')
+        .map((line) => line.trim())
+        .filter((line) => line.length > 0)
+        .join('\n\n')
+        .replace(/\n{3,}/g, '\n\n') || '';
     return text;
   },
 };

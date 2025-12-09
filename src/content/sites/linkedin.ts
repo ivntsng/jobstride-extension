@@ -1,13 +1,13 @@
 class LinkedIn extends JobSite {
   getSelectors(): JobSelectors {
     return {
-      jobPage: ".job-view-layout",
-      company: ".job-details-jobs-unified-top-card__company-name a",
-      title: ".t-24.job-details-jobs-unified-top-card__job-title h1",
+      jobPage: '.job-view-layout',
+      company: '.job-details-jobs-unified-top-card__company-name a',
+      title: '.t-24.job-details-jobs-unified-top-card__job-title h1',
       location:
-        ".job-details-jobs-unified-top-card__primary-description-container .tvm__text:first-child",
+        '.job-details-jobs-unified-top-card__primary-description-container .tvm__text:first-child',
       description:
-        ".jobs-description__content .jobs-description-content__text--stretch",
+        '.jobs-description__content .jobs-description-content__text--stretch',
     };
   }
 
@@ -29,25 +29,27 @@ class LinkedIn extends JobSite {
       description: document.querySelector(selectors.description),
     };
 
-    let description = "";
+    let description = '';
     if (elements.description) {
       description = window.convertHtmlToText(elements.description.innerHTML);
     }
 
-    let salaryRange = "";
-    const jobDetailsButtons = document.querySelectorAll(".job-details-fit-level-preferences button strong");
+    let salaryRange = '';
+    const jobDetailsButtons = document.querySelectorAll(
+      '.job-details-fit-level-preferences button strong',
+    );
     for (const button of jobDetailsButtons) {
-      const text = button.textContent?.trim() || "";
-      if (text.includes("$") || text.match(/\d+[kK]\/yr/)) {
+      const text = button.textContent?.trim() || '';
+      if (text.includes('$') || text.match(/\d+[kK]\/yr/)) {
         salaryRange = text;
         break;
       }
     }
 
     return {
-      company: elements.company?.textContent?.trim() || "",
-      position: elements.title?.textContent?.trim() || "",
-      location: elements.location?.textContent?.trim() || "",
+      company: elements.company?.textContent?.trim() || '',
+      position: elements.title?.textContent?.trim() || '',
+      location: elements.location?.textContent?.trim() || '',
       url: window.location.href,
       jobDescription: description,
       salaryRange: salaryRange,

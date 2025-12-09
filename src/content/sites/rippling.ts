@@ -3,19 +3,22 @@ class Rippling extends JobSite {
     return {
       jobPage: "[data-testid='breadcrumb'], .ATS_htmlPreview",
       company: "[data-testid='breadcrumb'] li:first-child a",
-      title: "h2",
+      title: 'h2',
       location: "[data-icon='LOCATION_OUTLINE'] + p",
-      description: ".ATS_htmlPreview",
+      description: '.ATS_htmlPreview',
     };
   }
 
   isJobPage(): Promise<boolean> {
     return new Promise((resolve) => {
       setTimeout(() => {
-        const hasBreadcrumb = document.querySelector('[data-testid="breadcrumb"]') !== null;
-        const hasDescription = document.querySelector('.ATS_htmlPreview') !== null;
-        const urlMatch = window.location.hostname.includes('rippling.com') &&
-                        window.location.pathname.includes('/jobs/');
+        const hasBreadcrumb =
+          document.querySelector('[data-testid="breadcrumb"]') !== null;
+        const hasDescription =
+          document.querySelector('.ATS_htmlPreview') !== null;
+        const urlMatch =
+          window.location.hostname.includes('rippling.com') &&
+          window.location.pathname.includes('/jobs/');
 
         const isJobPage = (hasBreadcrumb && hasDescription) || urlMatch;
         resolve(isJobPage);
@@ -32,25 +35,25 @@ class Rippling extends JobSite {
       description: document.querySelector(selectors.description),
     };
 
-    let company = elements.company?.textContent?.trim() || "";
+    let company = elements.company?.textContent?.trim() || '';
     company = company.replace(/\s*Careers?\s*$/i, '').trim();
 
     if (!company && window.location.pathname) {
-      const pathMatch = window.location.pathname.match(/\/([^\/]+)\/jobs/);
-      if (pathMatch && pathMatch[1]) {
+      const pathMatch = window.location.pathname.match(/\/([^/]+)\/jobs/);
+      if (pathMatch?.[1]) {
         company = pathMatch[1];
       }
     }
 
-    let description = "";
+    let description = '';
     if (elements.description) {
       description = window.convertHtmlToText(elements.description.innerHTML);
     }
 
     return {
       company: company,
-      position: elements.title?.textContent?.trim() || "",
-      location: elements.location?.textContent?.trim() || "",
+      position: elements.title?.textContent?.trim() || '',
+      location: elements.location?.textContent?.trim() || '',
       url: window.location.href,
       jobDescription: description,
     };
