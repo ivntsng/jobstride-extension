@@ -3,9 +3,6 @@ window.AUTH_CONFIG = window.AUTH_CONFIG || { apiBaseUrl: '' };
 const isAuthError = (error: any): boolean => {
   if (!error) return false;
 
-  if (typeof error.status === 'number' && (error.status === 401 || error.status === 403)) {
-    return true;
-  }
 
   const message = error.message || error.error || String(error);
   const authPatterns = [
