@@ -1,5 +1,27 @@
 window.AUTH_CONFIG = window.AUTH_CONFIG || { apiBaseUrl: '' };
 
+const isAuthError = (error: any): boolean => {
+  if (!error) return false;
+
+  if (typeof error.status === 'number' && (error.status === 401 || error.status === 403)) {
+    return true;
+  }
+
+  const message = error.message || error.error || String(error);
+  const authPatterns = [
+    /\b401\b/,
+    /\b403\b/,
+    /unauthorized/i,
+    /unauthenticated/i,
+    /forbidden/i,
+    /invalid.?token/i,
+    /token.?expired/i,
+    /auth.*failed/i,
+  ];
+
+  return authPatterns.some(pattern => pattern.test(message));
+};
+
 const showPopupToast = (type: 'success' | 'error', title: string, message: string) => {
   const existingToast = document.querySelector('.toast');
   if (existingToast) {
@@ -135,7 +157,7 @@ document.addEventListener('DOMContentLoaded', async function () {
   } catch (error: any) {
     console.error('Error fetching dashboards:', error);
     // If there's an authentication error, log out and force re-login
-    if (error.message && (error.message.includes('401') || error.message.includes('auth') || error.message.includes('token'))) {
+    if (isAuthError(error)) {
       await window.Auth.logout();
       window.location.reload();
     } else {
