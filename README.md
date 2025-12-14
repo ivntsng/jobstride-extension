@@ -1,6 +1,6 @@
-# NextStep Extension
+# JobStride Extension
 
-A TypeScript-powered Chrome extension for tracking job applications across multiple job boards. Seamlessly integrates with the NextStep app to help you organize and manage your job search.
+A TypeScript-powered Chrome extension for tracking job applications across multiple job boards. Seamlessly integrates with the JobStride app to help you organize and manage your job search.
 
 ## Features
 
@@ -19,8 +19,8 @@ A TypeScript-powered Chrome extension for tracking job applications across multi
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/ivntsng/nextstep-extension.git
-   cd nextstep-extension
+   git clone https://github.com/ivntsng/jobstride-extension.git
+   cd jobstride-extension
    ```
 
 2. **Install bun** (if not already installed)
@@ -110,7 +110,7 @@ bun run clean
 3. Click the **"Track This Job"** button that appears on the page
 4. Review auto-filled details (company, position, location, etc.)
 5. Select a dashboard
-6. Click **"Save"** to add to your NextStep account
+6. Click **"Save"** to add to your JobStride account
 
 ## Contributing
 
