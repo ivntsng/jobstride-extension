@@ -1,6 +1,7 @@
 interface EnvConfig {
   API_BASE_URL: string;
   WEB_APP_URL: string;
+  SUPABASE_STORAGE_KEY: string;
 }
 
 interface JobDetails {
@@ -93,13 +94,15 @@ interface SavedFormData {
 interface Window {
   AUTH_CONFIG: {
     apiBaseUrl: string;
-    webAppUrl?: string;
+    webAppUrl: string;
+    supabaseStorageKey: string;
   };
   Auth: {
     checkAuthStatus(): Promise<boolean>;
     getUserDashboards(): Promise<Dashboard[] | null>;
     openWebAppLogin(): Promise<void>;
     logout(): Promise<void>;
+    getAccessToken(): Promise<string | null>;
   };
   JobSite: any;
   Indeed: any;

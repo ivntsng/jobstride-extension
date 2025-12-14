@@ -1,4 +1,31 @@
-window.AUTH_CONFIG = window.AUTH_CONFIG || { apiBaseUrl: '' };
+window.AUTH_CONFIG = window.AUTH_CONFIG || {
+  apiBaseUrl: '',
+  webAppUrl: '',
+  supabaseStorageKey: '',
+};
+
+const sendApiRequest = async (config: {
+  url: string;
+  method: string;
+  headers: Record<string, string>;
+  body?: string;
+}): Promise<{ success: boolean; data?: any; error?: string }> => {
+  return new Promise((resolve) => {
+    chrome.runtime.sendMessage(
+      { type: 'FETCH_REQUEST', config },
+      (response) => {
+        if (chrome.runtime.lastError) {
+          resolve({
+            success: false,
+            error: chrome.runtime.lastError.message || 'Unknown error',
+          });
+        } else {
+          resolve(response || { success: false, error: 'No response' });
+        }
+      },
+    );
+  });
+};
 
 const isAuthError = (error: any): boolean => {
   if (!error) return false;
@@ -112,9 +139,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     loginContainer.innerHTML = `
       <h2 style="margin-bottom: 15px; font-size: 18px;">Login Required</h2>
       <p style="margin-bottom: 20px; color: #666; font-size: 14px;">
-        Please visit the NextStep web app to log in with GitHub, then reopen this extension.
+        Please visit JobStride to log in, then reopen this extension.
       </p>
-      <button id="open-web-app" class="btn-primary" style="margin-bottom: 10px;">Open NextStep Web App</button>
+      <button id="open-web-app" class="btn-primary" style="margin-bottom: 10px;">Open JobStride</button>
     `;
     document.querySelector('.card')?.appendChild(loginContainer);
 
@@ -126,7 +153,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         loginContainer.innerHTML = `
           <h2 style="margin-bottom: 15px; font-size: 18px; color: #10b981;">✓ Tab Opened</h2>
           <p style="margin-bottom: 20px; color: #666; font-size: 14px;">
-            Please log in to NextStep in the new tab, then reopen this extension.
+            Please log in to JobStride in the new tab, then reopen this extension.
           </p>
           <button class="btn-primary" onclick="window.close()">Close</button>
         `;
@@ -221,22 +248,32 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     try {
-      const response = await fetch(`${window.AUTH_CONFIG.apiBaseUrl}/jobs`, {
+      const accessToken = await window.Auth.getAccessToken();
+      if (!accessToken) {
+        await window.Auth.logout();
+        window.location.reload();
+        return;
+      }
+
+      const response = await sendApiRequest({
+        url: `${window.AUTH_CONFIG.apiBaseUrl}/jobs`,
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${(await chrome.storage.local.get('token')).token}`,
+          Accept: 'application/json',
+          Authorization: `Bearer ${accessToken}`,
         },
-        credentials: 'include',
-        mode: 'cors',
         body: JSON.stringify(jobData),
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to save job');
+      if (!response.success) {
+        if (isAuthError({ message: response.error })) {
+          await window.Auth.logout();
+          window.location.reload();
+          return;
+        }
+        throw new Error(response.error || 'Failed to save job');
       }
-
-      await response.json();
 
       showPopupToast(
         'success',
@@ -290,21 +327,34 @@ document.addEventListener('DOMContentLoaded', async () => {
       ).value.trim();
 
       try {
-        const response = await fetch(
-          `${window.AUTH_CONFIG.apiBaseUrl}/dashboards/`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${(await chrome.storage.local.get('token')).token}`,
-            },
-            body: JSON.stringify({ name: newDashboardName }),
+        const accessToken = await window.Auth.getAccessToken();
+        if (!accessToken) {
+          await window.Auth.logout();
+          window.location.reload();
+          return;
+        }
+
+        const response = await sendApiRequest({
+          url: `${window.AUTH_CONFIG.apiBaseUrl}/dashboards/`,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+            Authorization: `Bearer ${accessToken}`,
           },
-        );
+          body: JSON.stringify({ name: newDashboardName }),
+        });
 
-        if (!response.ok) throw new Error('Failed to create dashboard');
+        if (!response.success) {
+          if (isAuthError({ message: response.error })) {
+            await window.Auth.logout();
+            window.location.reload();
+            return;
+          }
+          throw new Error(response.error || 'Failed to create dashboard');
+        }
 
-        const newDashboard = await response.json();
+        const newDashboard = response.data;
 
         const option = new Option(newDashboard.name, newDashboard.id);
         dashboardSelect.add(option);

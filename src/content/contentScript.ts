@@ -1,4 +1,8 @@
-window.AUTH_CONFIG = window.AUTH_CONFIG || { apiBaseUrl: '' };
+window.AUTH_CONFIG = window.AUTH_CONFIG || {
+  apiBaseUrl: '',
+  webAppUrl: '',
+  supabaseStorageKey: '',
+};
 
 let _currentToken: string | null = null;
 
@@ -105,15 +109,14 @@ async function initializeModalFunctionality(modal: HTMLElement): Promise<void> {
     submitBtn.textContent = 'Saving...';
 
     try {
-      // Get token from storage
-      const tokenData = await chrome.storage.local.get('token');
-      const token = tokenData.token;
+      // Get access token using Auth service
+      const accessToken = await window.Auth.getAccessToken();
 
-      if (!token) {
+      if (!accessToken) {
         showContentToast(
           'error',
           'Authentication Required',
-          'Please login first',
+          'Please login via the extension popup first',
         );
         return;
       }
@@ -149,7 +152,8 @@ async function initializeModalFunctionality(modal: HTMLElement): Promise<void> {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
+            Accept: 'application/json',
+            Authorization: `Bearer ${accessToken}`,
           },
           body: JSON.stringify(jobData),
         },
