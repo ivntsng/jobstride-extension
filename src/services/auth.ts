@@ -28,7 +28,10 @@ interface AuthService {
 
 class Auth implements AuthService {
   private getSupabaseStorageKey(): string {
-    return (window as any).AUTH_CONFIG?.supabaseStorageKey || 'sb-bxxojrwocxrehaodlesq-auth-token';
+    return (
+      (window as any).AUTH_CONFIG?.supabaseStorageKey ||
+      'sb-bxxojrwocxrehaodlesq-auth-token'
+    );
   }
 
   private isTokenExpired(expiresAt: number): boolean {
@@ -100,12 +103,10 @@ class Auth implements AuthService {
                 return auth;
               }
             }
-          } catch {
-          }
+          } catch {}
         }
       }
-    } catch {
-    }
+    } catch {}
 
     return null;
   }
@@ -151,8 +152,13 @@ class Auth implements AuthService {
         if (chrome.runtime.lastError) {
           reject(chrome.runtime.lastError);
         } else if (!response || !response.success) {
-          const error = new Error(response?.error || 'Failed to fetch dashboards');
-          if (response?.error?.includes('401') || response?.error?.includes('403')) {
+          const error = new Error(
+            response?.error || 'Failed to fetch dashboards',
+          );
+          if (
+            response?.error?.includes('401') ||
+            response?.error?.includes('403')
+          ) {
             chrome.storage.local.remove('auth');
           }
           reject(error);

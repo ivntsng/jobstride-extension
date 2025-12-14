@@ -1,4 +1,8 @@
-window.AUTH_CONFIG = window.AUTH_CONFIG || { apiBaseUrl: '', webAppUrl: '', supabaseStorageKey: '' };
+window.AUTH_CONFIG = window.AUTH_CONFIG || {
+  apiBaseUrl: '',
+  webAppUrl: '',
+  supabaseStorageKey: '',
+};
 
 let _currentToken: string | null = null;
 

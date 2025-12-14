@@ -1,4 +1,8 @@
-window.AUTH_CONFIG = window.AUTH_CONFIG || { apiBaseUrl: '', webAppUrl: '', supabaseStorageKey: '' };
+window.AUTH_CONFIG = window.AUTH_CONFIG || {
+  apiBaseUrl: '',
+  webAppUrl: '',
+  supabaseStorageKey: '',
+};
 
 const sendApiRequest = async (config: {
   url: string;
@@ -11,11 +15,14 @@ const sendApiRequest = async (config: {
       { type: 'FETCH_REQUEST', config },
       (response) => {
         if (chrome.runtime.lastError) {
-          resolve({ success: false, error: chrome.runtime.lastError.message || 'Unknown error' });
+          resolve({
+            success: false,
+            error: chrome.runtime.lastError.message || 'Unknown error',
+          });
         } else {
           resolve(response || { success: false, error: 'No response' });
         }
-      }
+      },
     );
   });
 };
