@@ -1,6 +1,7 @@
 const defaultConfig: EnvConfig = {
-  API_BASE_URL: 'https://nextstep-backend.vercel.app',
-  WEB_APP_URL: 'https://nextstep-app.vercel.app',
+  API_BASE_URL: 'https://api.jobstride.app',
+  WEB_APP_URL: 'https://jobstride.app',
+  SUPABASE_STORAGE_KEY: 'sb-bxxojrwocxrehaodlesq-auth-token',
 };
 
 function getEnvVar(_key: keyof EnvConfig, defaultValue: string): string {
@@ -10,11 +11,13 @@ function getEnvVar(_key: keyof EnvConfig, defaultValue: string): string {
 const envConfig: EnvConfig = {
   API_BASE_URL: getEnvVar('API_BASE_URL', defaultConfig.API_BASE_URL),
   WEB_APP_URL: getEnvVar('WEB_APP_URL', defaultConfig.WEB_APP_URL),
+  SUPABASE_STORAGE_KEY: defaultConfig.SUPABASE_STORAGE_KEY,
 };
 
 if (typeof window !== 'undefined') {
   window.AUTH_CONFIG = {
     apiBaseUrl: envConfig.API_BASE_URL,
-  } as any;
-  (window as any).AUTH_CONFIG.webAppUrl = envConfig.WEB_APP_URL;
+    webAppUrl: envConfig.WEB_APP_URL,
+    supabaseStorageKey: envConfig.SUPABASE_STORAGE_KEY,
+  };
 }
