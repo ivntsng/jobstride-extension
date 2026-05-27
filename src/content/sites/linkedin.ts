@@ -1,7 +1,8 @@
 class LinkedIn extends JobSite {
   getSelectors(): JobSelectors {
     return {
-      jobPage: '.job-view-layout',
+      jobPage:
+        '.job-view-layout, .jobs-search__job-details, .job-details-jobs-container',
       company: '.job-details-jobs-unified-top-card__company-name a',
       title: '.t-24.job-details-jobs-unified-top-card__job-title h1',
       location:
@@ -11,11 +12,30 @@ class LinkedIn extends JobSite {
     };
   }
 
+  private isLinkedInJobUrl(): boolean {
+    if (window.location.pathname.startsWith('/jobs/view/')) {
+      return true;
+    }
+
+    if (!window.location.pathname.startsWith('/jobs/')) {
+      return false;
+    }
+
+    try {
+      return new URL(window.location.href).searchParams.has('currentJobId');
+    } catch {
+      return window.location.search.includes('currentJobId=');
+    }
+  }
+
   isJobPage(): Promise<boolean> {
     const selectors = this.getSelectors();
     return new Promise((resolve) => {
       setTimeout(() => {
-        resolve(document.querySelector(selectors.jobPage) !== null);
+        resolve(
+          document.querySelector(selectors.jobPage) !== null ||
+            this.isLinkedInJobUrl(),
+        );
       }, 500);
     });
   }
