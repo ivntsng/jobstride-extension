@@ -6,6 +6,21 @@ window.AUTH_CONFIG = window.AUTH_CONFIG || {
 
 let _currentToken: string | null = null;
 
+const escapeContentHtml = (value: string): string =>
+  value.replace(
+    /[&<>"']/g,
+    (char) =>
+      (
+        ({
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;',
+        }) as Record<string, string>
+      )[char] || char,
+  );
+
 const showContentToast = (
   type: 'success' | 'error',
   title: string,
@@ -17,18 +32,27 @@ const showContentToast = (
   }
 
   const toast = document.createElement('div');
-  toast.className = `job-tracker-toast ${type}`;
+  toast.className = `job-tracker-toast jobstride-toast jobstride-toast--${type}`;
+  toast.setAttribute('role', type === 'error' ? 'alert' : 'status');
 
-  const icon = type === 'success' ? '✓' : '✕';
-  const iconColor = type === 'success' ? '#10b981' : '#ef4444';
+  const icon =
+    type === 'success'
+      ? '<path d="m5 12 4 4L19 6" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" />'
+      : '<path d="M12 8v5M12 16h.01" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" />';
 
   toast.innerHTML = `
-    <div class="toast-icon" style="color: ${iconColor}">${icon}</div>
-    <div class="toast-content">
-      <div class="toast-title">${title}</div>
-      <div class="toast-message">${message}</div>
+    <div class="toast-icon jobstride-toast-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none">${icon}</svg>
     </div>
-    <button class="toast-close">&times;</button>
+    <div class="toast-content jobstride-toast-content">
+      <div class="toast-title jobstride-toast-title">${escapeContentHtml(title)}</div>
+      <div class="toast-message jobstride-toast-message">${escapeContentHtml(message)}</div>
+    </div>
+    <button class="toast-close jobstride-toast-close jobstride-icon-button" aria-label="Dismiss notification">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M18 6 6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+      </svg>
+    </button>
   `;
 
   document.body.appendChild(toast);
@@ -85,7 +109,10 @@ async function initializeModalFunctionality(modal: HTMLElement): Promise<void> {
       dashboardSelect.innerHTML =
         '<option value="" disabled>Select a dashboard...</option>' +
         dashboards
-          .map((d: Dashboard) => `<option value="${d.id}">${d.name}</option>`)
+          .map(
+            (d: Dashboard) =>
+              `<option value="${escapeContentHtml(d.id)}">${escapeContentHtml(d.name)}</option>`,
+          )
           .join('');
 
       dashboardSelect.value = dashboards[0]?.id || '';
@@ -94,16 +121,21 @@ async function initializeModalFunctionality(modal: HTMLElement): Promise<void> {
         '<option value="" disabled selected>No dashboards found</option>';
     }
   } catch (error: any) {
-    dashboardSelect.innerHTML = `<option value="" disabled selected>Error: ${error.message || 'loading dashboards'}</option>`;
+    dashboardSelect.innerHTML = `<option value="" disabled selected>Error: ${escapeContentHtml(error.message || 'loading dashboards')}</option>`;
   }
 
+  if (form.dataset.jobstrideSubmitBound === 'true') {
+    return;
+  }
+
+  form.dataset.jobstrideSubmitBound = 'true';
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const submitBtn = form.querySelector(
       'button[type="submit"]',
     ) as HTMLButtonElement;
-    const originalText = submitBtn.textContent;
+    const originalHtml = submitBtn.innerHTML;
     submitBtn.disabled = true;
     submitBtn.classList.add('loading');
     submitBtn.textContent = 'Saving...';
@@ -184,7 +216,7 @@ async function initializeModalFunctionality(modal: HTMLElement): Promise<void> {
         'Success!',
         'Job information saved successfully',
       );
-      (modal as HTMLElement).style.display = 'none';
+      closeJobTrackerModal(modal);
     } catch (_error) {
       showContentToast(
         'error',
@@ -195,9 +227,17 @@ async function initializeModalFunctionality(modal: HTMLElement): Promise<void> {
       // Reset button state
       submitBtn.disabled = false;
       submitBtn.classList.remove('loading');
-      submitBtn.textContent = originalText || 'Save';
+      submitBtn.innerHTML = originalHtml || 'Save job';
     }
   });
+}
+
+function openJobTrackerModal(modal: HTMLElement): void {
+  modal.classList.add('is-open');
+}
+
+function closeJobTrackerModal(modal: HTMLElement): void {
+  modal.classList.remove('is-open');
 }
 
 /*******************************
@@ -277,7 +317,16 @@ function createFloatingButton(jobSite: JobSite): void {
 
   const button = document.createElement('button');
   button.id = 'job-tracker-btn';
-  button.textContent = 'Track This Job';
+  button.type = 'button';
+  button.setAttribute('aria-label', 'Track this job');
+  button.innerHTML = `
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M9 7V6a3 3 0 0 1 6 0v1" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+      <path d="M5 7h14v11.5A1.5 1.5 0 0 1 17.5 20h-11A1.5 1.5 0 0 1 5 18.5V7Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
+      <path d="M9 12h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+    </svg>
+    <span class="jobstride-floating-label">Track this job</span>
+  `;
   document.body.appendChild(button);
 
   const modal = window.createModalForm();
@@ -298,19 +347,30 @@ function createFloatingButton(jobSite: JobSite): void {
     (modal.querySelector('#salaryRange') as HTMLInputElement).value =
       jobDetails.salaryRange || '';
 
-    modal.style.display = 'block';
+    openJobTrackerModal(modal);
   });
 
   const closeBtn = modal.querySelector('.close') as HTMLElement;
   closeBtn.onclick = () => {
-    modal.style.display = 'none';
+    closeJobTrackerModal(modal);
   };
 
-  window.onclick = (event: MouseEvent) => {
+  const cancelBtn = modal.querySelector('.jobstride-dialog-cancel');
+  cancelBtn?.addEventListener('click', () => {
+    closeJobTrackerModal(modal);
+  });
+
+  window.addEventListener('click', (event: MouseEvent) => {
     if (event.target === modal) {
-      modal.style.display = 'none';
+      closeJobTrackerModal(modal);
     }
-  };
+  });
+
+  window.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && modal.classList.contains('is-open')) {
+      closeJobTrackerModal(modal);
+    }
+  });
 
   initializeModalFunctionality(modal);
 }

@@ -3,102 +3,202 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Job Tracker</title>
-
-    <!-- Use a modern Google Font -->
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600,700&display=swap"
-    />
-
-    <!-- Link your custom CSS -->
+    <title>JobStride</title>
+    <link rel="stylesheet" href="../shared/styles/jobstride-ui.css" />
     <link rel="stylesheet" href="styles/style.css" />
   </head>
-  <body>
-    <!-- Card Container -->
-    <div class="card">
-      <button class="close-popup">&times;</button>
-      <h1 class="title">Track Your Job</h1>
-      <form id="job-form">
-        <div class="form-group">
-          <label for="dashboardName">Select Dashboard</label>
-          <select id="dashboardName" required>
-            <option value="" disabled selected>Choose a dashboard...</option>
-          </select>
+  <body class="jobstride-popup jobstride-surface">
+    <main class="card jobstride-card jobstride-popup-card">
+      <header class="jobstride-header">
+        <div class="jobstride-brand">
+          <span class="jobstride-brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path
+                d="M9 7V6a3 3 0 0 1 6 0v1"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
+              <path
+                d="M5 7h14v11.5A1.5 1.5 0 0 1 17.5 20h-11A1.5 1.5 0 0 1 5 18.5V7Z"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M9 12h6"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
+            </svg>
+          </span>
+          <div class="jobstride-title-group">
+            <h1 class="jobstride-title">JobStride</h1>
+            <p class="jobstride-subtitle">Track this job</p>
+          </div>
+        </div>
+        <button class="close-popup jobstride-icon-button" aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path
+              d="M18 6 6 18M6 6l12 12"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+          </svg>
+        </button>
+      </header>
+
+      <form id="job-form" class="jobstride-form">
+        <div class="form-group jobstride-field">
+          <label class="jobstride-label" for="dashboardName">
+            Select Dashboard
+          </label>
+          <div class="jobstride-inline-control">
+            <select
+              id="dashboardName"
+              class="jobstride-control jobstride-select"
+              required
+            >
+              <option value="" disabled selected>Choose a dashboard...</option>
+            </select>
+            <button
+              type="button"
+              id="open-create-dashboard"
+              class="jobstride-button jobstride-button--secondary"
+            >
+              New
+            </button>
+          </div>
         </div>
 
-        <div class="form-group">
-          <label for="company">Company</label>
-          <input type="text" id="company" placeholder="e.g. Google" required />
+        <div class="form-group jobstride-field">
+          <label class="jobstride-label" for="company">Company</label>
+          <input
+            type="text"
+            id="company"
+            class="jobstride-control"
+            placeholder="e.g. Acme Inc."
+            required
+          />
         </div>
 
-        <div class="form-group">
-          <label for="position">Position</label>
+        <div class="form-group jobstride-field">
+          <label class="jobstride-label" for="position">Position</label>
           <input
             type="text"
             id="position"
-            placeholder="e.g. Frontend Engineer"
+            class="jobstride-control"
+            placeholder="e.g. Senior Product Manager"
             required
           />
         </div>
 
-        <div class="form-group">
-          <label for="location">Location</label>
+        <div class="form-group jobstride-field">
+          <label class="jobstride-label" for="location">Location</label>
           <input
             type="text"
             id="location"
-            placeholder="e.g. San Francisco"
+            class="jobstride-control"
+            placeholder="e.g. Remote or New York, NY"
             required
           />
         </div>
 
-        <div class="form-group">
-          <label for="jobDescription">Job Description</label>
+        <div class="form-group jobstride-field">
+          <label class="jobstride-label" for="jobDescription">
+            Job Description
+          </label>
           <textarea
             id="jobDescription"
+            class="jobstride-control jobstride-textarea"
             rows="6"
-            placeholder="Job description and requirements"
+            placeholder="Add notes about the role, requirements, etc."
           ></textarea>
         </div>
 
-        <div class="form-group">
-          <label for="url">Job URL</label>
+        <div class="form-group jobstride-field">
+          <label class="jobstride-label" for="url">Job URL</label>
           <input
             type="url"
             id="url"
-            placeholder="https://example.com/job-post"
+            class="jobstride-control"
+            placeholder="https://jobboard.com/jobs/12345"
           />
         </div>
 
-        <div class="form-group">
-          <label for="salaryRange">Salary Range</label>
-          <input type="text" id="salaryRange" placeholder="$80k - $100k" />
+        <div class="form-group jobstride-field">
+          <label class="jobstride-label" for="salaryRange">Salary Range</label>
+          <input
+            type="text"
+            id="salaryRange"
+            class="jobstride-control"
+            placeholder="e.g. $120,000 - $150,000"
+          />
         </div>
 
-        <button type="submit" class="btn-primary">Save</button>
+        <button
+          type="submit"
+          class="btn-primary jobstride-button jobstride-button--primary jobstride-button--block"
+        >
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path
+              d="M6 4.5h12v15l-6-3.5-6 3.5v-15Z"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linejoin="round"
+            />
+          </svg>
+          Save job
+        </button>
       </form>
-    </div>
+    </main>
 
-    <div id="createDashboardModal" class="modal">
-      <div class="modal-content">
-        <span class="close-modal">&times;</span>
-        <h2>Create New Dashboard</h2>
-        <form id="dashboard-form">
-          <div class="form-group">
-            <label for="newDashboardName">Dashboard Name</label>
+    <div
+      id="createDashboardModal"
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="createDashboardTitle"
+    >
+      <div class="modal-content jobstride-card">
+        <button class="close-modal jobstride-icon-button" aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path
+              d="M18 6 6 18M6 6l12 12"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+          </svg>
+        </button>
+        <h2 id="createDashboardTitle" class="jobstride-title">
+          Create Dashboard
+        </h2>
+        <form id="dashboard-form" class="jobstride-form">
+          <div class="form-group jobstride-field">
+            <label class="jobstride-label" for="newDashboardName">
+              Dashboard Name
+            </label>
             <input
               type="text"
               id="newDashboardName"
-              placeholder="e.g. Tech Applications 2024"
+              class="jobstride-control"
+              placeholder="e.g. Product roles"
               required
             />
           </div>
-          <button type="submit" class="btn-primary">Create Dashboard</button>
+          <button
+            type="submit"
+            class="btn-primary jobstride-button jobstride-button--primary jobstride-button--block"
+          >
+            Create dashboard
+          </button>
         </form>
       </div>
     </div>
 
-    <!-- Scripts -->
     <script src="../config/env.js"></script>
     <script src="../services/auth.js"></script>
     <script src="popup.js"></script>
