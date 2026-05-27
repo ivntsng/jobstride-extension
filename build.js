@@ -63,6 +63,7 @@ fs.writeFileSync(
 );
 
 const cssDirs = [
+  { src: 'src/shared/styles', dest: 'dist/shared/styles' },
   { src: 'src/content/styles', dest: 'dist/content/styles' },
   { src: 'src/popup/styles', dest: 'dist/popup/styles' },
 ];

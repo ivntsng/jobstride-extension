@@ -36,7 +36,10 @@
         "src/content/sites/linkedin.js",
         "src/content/contentScript.js"
       ],
-      "css": ["src/content/styles/contentStyle.css"],
+      "css": [
+        "src/shared/styles/jobstride-ui.css",
+        "src/content/styles/contentStyle.css"
+      ],
       "run_at": "document_end"
     },
     {
@@ -50,7 +53,10 @@
         "src/content/sites/indeed.js",
         "src/content/contentScript.js"
       ],
-      "css": ["src/content/styles/contentStyle.css"],
+      "css": [
+        "src/shared/styles/jobstride-ui.css",
+        "src/content/styles/contentStyle.css"
+      ],
       "run_at": "document_end"
     },
     {
@@ -64,7 +70,10 @@
         "src/content/sites/ashby.js",
         "src/content/contentScript.js"
       ],
-      "css": ["src/content/styles/contentStyle.css"],
+      "css": [
+        "src/shared/styles/jobstride-ui.css",
+        "src/content/styles/contentStyle.css"
+      ],
       "run_at": "document_end"
     },
     {
@@ -78,7 +87,10 @@
         "src/content/sites/greenhouse.js",
         "src/content/contentScript.js"
       ],
-      "css": ["src/content/styles/contentStyle.css"],
+      "css": [
+        "src/shared/styles/jobstride-ui.css",
+        "src/content/styles/contentStyle.css"
+      ],
       "run_at": "document_end"
     },
     {
@@ -92,7 +104,10 @@
         "src/content/sites/lever.js",
         "src/content/contentScript.js"
       ],
-      "css": ["src/content/styles/contentStyle.css"],
+      "css": [
+        "src/shared/styles/jobstride-ui.css",
+        "src/content/styles/contentStyle.css"
+      ],
       "run_at": "document_end"
     },
     {
@@ -106,7 +121,10 @@
         "src/content/sites/workday.js",
         "src/content/contentScript.js"
       ],
-      "css": ["src/content/styles/contentStyle.css"],
+      "css": [
+        "src/shared/styles/jobstride-ui.css",
+        "src/content/styles/contentStyle.css"
+      ],
       "run_at": "document_end"
     },
     {
@@ -120,7 +138,10 @@
         "src/content/sites/rippling.js",
         "src/content/contentScript.js"
       ],
-      "css": ["src/content/styles/contentStyle.css"],
+      "css": [
+        "src/shared/styles/jobstride-ui.css",
+        "src/content/styles/contentStyle.css"
+      ],
       "run_at": "document_end"
     }
   ],

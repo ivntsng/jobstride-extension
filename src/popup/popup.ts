@@ -45,6 +45,21 @@ const isAuthError = (error: any): boolean => {
   return authPatterns.some((pattern) => pattern.test(message));
 };
 
+const escapePopupHtml = (value: string): string =>
+  value.replace(
+    /[&<>"']/g,
+    (char) =>
+      (
+        ({
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;',
+        }) as Record<string, string>
+      )[char] || char,
+  );
+
 const showPopupToast = (
   type: 'success' | 'error',
   title: string,
@@ -56,18 +71,27 @@ const showPopupToast = (
   }
 
   const toast = document.createElement('div');
-  toast.className = `toast ${type}`;
+  toast.className = `toast jobstride-toast jobstride-toast--${type}`;
+  toast.setAttribute('role', type === 'error' ? 'alert' : 'status');
 
-  const icon = type === 'success' ? '✓' : '✕';
-  const iconColor = type === 'success' ? '#10b981' : '#ef4444';
+  const icon =
+    type === 'success'
+      ? '<path d="m5 12 4 4L19 6" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" />'
+      : '<path d="M12 8v5M12 16h.01" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" />';
 
   toast.innerHTML = `
-    <div class="toast-icon" style="color: ${iconColor}">${icon}</div>
-    <div class="toast-content">
-      <div class="toast-title">${title}</div>
-      <div class="toast-message">${message}</div>
+    <div class="toast-icon jobstride-toast-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none">${icon}</svg>
     </div>
-    <button class="toast-close">&times;</button>
+    <div class="toast-content jobstride-toast-content">
+      <div class="toast-title jobstride-toast-title">${escapePopupHtml(title)}</div>
+      <div class="toast-message jobstride-toast-message">${escapePopupHtml(message)}</div>
+    </div>
+    <button class="toast-close jobstride-toast-close jobstride-icon-button" aria-label="Dismiss notification">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M18 6 6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+      </svg>
+    </button>
   `;
 
   document.body.appendChild(toast);
@@ -93,6 +117,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   ) as HTMLSelectElement;
 
   if (!form || !dashboardSelect) return;
+
+  document
+    .querySelector('.close-popup')
+    ?.addEventListener('click', () => window.close());
 
   const savedData = await chrome.storage.local.get('formData');
   if (savedData.formData) {
@@ -135,13 +163,19 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (!isAuthenticated) {
     form.style.display = 'none';
     const loginContainer = document.createElement('div');
-    loginContainer.style.cssText = 'text-align: center; padding: 20px;';
+    loginContainer.className = 'jobstride-empty-state';
     loginContainer.innerHTML = `
-      <h2 style="margin-bottom: 15px; font-size: 18px;">Login Required</h2>
-      <p style="margin-bottom: 20px; color: #666; font-size: 14px;">
+      <span class="jobstride-brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M7 11V8a5 5 0 0 1 10 0v3" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+          <path d="M6 11h12v8H6v-8Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
+        </svg>
+      </span>
+      <h2 class="jobstride-empty-title">Login Required</h2>
+      <p class="jobstride-empty-copy">
         Please visit JobStride to log in, then reopen this extension.
       </p>
-      <button id="open-web-app" class="btn-primary" style="margin-bottom: 10px;">Open JobStride</button>
+      <button id="open-web-app" class="btn-primary jobstride-button jobstride-button--primary jobstride-button--block">Open JobStride</button>
     `;
     document.querySelector('.card')?.appendChild(loginContainer);
 
@@ -151,12 +185,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         await window.Auth.openWebAppLogin();
         // Show success message after opening the tab
         loginContainer.innerHTML = `
-          <h2 style="margin-bottom: 15px; font-size: 18px; color: #10b981;">✓ Tab Opened</h2>
-          <p style="margin-bottom: 20px; color: #666; font-size: 14px;">
+          <span class="jobstride-brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="m5 12 4 4L19 6" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </span>
+          <h2 class="jobstride-empty-title">Tab Opened</h2>
+          <p class="jobstride-empty-copy">
             Please log in to JobStride in the new tab, then reopen this extension.
           </p>
-          <button class="btn-primary" onclick="window.close()">Close</button>
+          <button id="close-after-login" class="btn-primary jobstride-button jobstride-button--primary jobstride-button--block">Close</button>
         `;
+        document
+          .getElementById('close-after-login')
+          ?.addEventListener('click', () => window.close());
       } catch (_error) {
         showPopupToast(
           'error',
@@ -183,7 +225,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (dashboards.length > 0) {
       dashboardSelect.innerHTML = dashboards
-        .map((d: Dashboard) => `<option value="${d.id}">${d.name}</option>`)
+        .map(
+          (d: Dashboard) =>
+            `<option value="${escapePopupHtml(d.id)}">${escapePopupHtml(d.name)}</option>`,
+        )
         .join('');
 
       const savedData = await chrome.storage.local.get('formData');
@@ -191,7 +236,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         dashboardSelect.value = savedData.formData.dashboardName;
       }
 
-      form.style.display = 'block';
+      form.style.display = '';
     } else {
       dashboardSelect.innerHTML =
         '<option value="" disabled selected>No dashboards found</option>';
@@ -218,7 +263,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const submitBtn = form.querySelector(
       'button[type="submit"]',
     ) as HTMLButtonElement;
-    const originalText = submitBtn.textContent;
+    const originalHtml = submitBtn.innerHTML;
     submitBtn.disabled = true;
     submitBtn.classList.add('loading');
     submitBtn.textContent = 'Saving...';
@@ -288,25 +333,45 @@ document.addEventListener('DOMContentLoaded', async () => {
     } finally {
       submitBtn.disabled = false;
       submitBtn.classList.remove('loading');
-      submitBtn.textContent = originalText || 'Save';
+      submitBtn.innerHTML = originalHtml || 'Save job';
     }
   });
 
   const modal = document.getElementById('createDashboardModal') as HTMLElement;
   const closeModal = modal?.querySelector('.close-modal') as HTMLElement;
+  const openCreateDashboard = document.getElementById(
+    'open-create-dashboard',
+  ) as HTMLButtonElement | null;
   const dashboardForm = document.getElementById(
     'dashboard-form',
   ) as HTMLFormElement;
 
+  const closeDashboardModal = () => {
+    modal?.classList.remove('is-open');
+  };
+
+  openCreateDashboard?.addEventListener('click', () => {
+    modal?.classList.add('is-open');
+    (
+      document.getElementById('newDashboardName') as HTMLInputElement | null
+    )?.focus();
+  });
+
   if (closeModal) {
     closeModal.addEventListener('click', () => {
-      modal.style.display = 'none';
+      closeDashboardModal();
     });
   }
 
   window.addEventListener('click', (event) => {
     if (event.target === modal) {
-      modal.style.display = 'none';
+      closeDashboardModal();
+    }
+  });
+
+  window.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && modal?.classList.contains('is-open')) {
+      closeDashboardModal();
     }
   });
 
@@ -317,7 +382,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const submitBtn = dashboardForm.querySelector(
         'button[type="submit"]',
       ) as HTMLButtonElement;
-      const originalText = submitBtn.textContent;
+      const originalHtml = submitBtn.innerHTML;
       submitBtn.disabled = true;
       submitBtn.classList.add('loading');
       submitBtn.textContent = 'Creating...';
@@ -360,7 +425,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         dashboardSelect.add(option);
         dashboardSelect.value = newDashboard.id;
 
-        modal.style.display = 'none';
+        closeDashboardModal();
         dashboardForm.reset();
 
         showPopupToast(
@@ -377,7 +442,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       } finally {
         submitBtn.disabled = false;
         submitBtn.classList.remove('loading');
-        submitBtn.textContent = originalText || 'Create Dashboard';
+        submitBtn.innerHTML = originalHtml || 'Create dashboard';
       }
     });
   }
