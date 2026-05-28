@@ -59,7 +59,6 @@ interface AuthResponse {
 interface ChromeMessage {
   type: string;
   config?: any;
-  token?: string;
 }
 
 interface RequestConfig {
@@ -102,7 +101,9 @@ interface Window {
     getUserDashboards(): Promise<Dashboard[] | null>;
     openWebAppLogin(): Promise<void>;
     logout(): Promise<void>;
-    getAccessToken(): Promise<string | null>;
+    syncAuthFromCurrentPage(): Promise<boolean>;
+    saveJob(jobData: JobApplication): Promise<any>;
+    createDashboard(name: string): Promise<Dashboard>;
   };
   JobSite: any;
   Indeed: any;
