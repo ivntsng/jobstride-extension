@@ -17,14 +17,29 @@
       "32": "icons/favicon_24x24.png"
     }
   },
-  "permissions": ["storage", "activeTab", "scripting", "webRequest", "windows"],
+  "permissions": ["storage", "scripting"],
   "host_permissions": [
     "http://localhost:8080/*",
     "https://localhost:8080/*",
+    "http://localhost:5173/*",
+    "https://localhost:5173/*",
     "https://jobstride.app/*",
     "https://api.jobstride.app/*"
   ],
   "content_scripts": [
+    {
+      "matches": [
+        "https://jobstride.app/*",
+        "http://localhost:5173/*",
+        "https://localhost:5173/*"
+      ],
+      "js": [
+        "src/config/env.js",
+        "src/services/auth.js",
+        "src/content/authSync.js"
+      ],
+      "run_at": "document_idle"
+    },
     {
       "matches": ["*://*.linkedin.com/*"],
       "js": [
@@ -145,18 +160,8 @@
       "run_at": "document_end"
     }
   ],
-  "web_accessible_resources": [
-    {
-      "resources": [
-        "src/popup/popup.html",
-        "src/popup/popup.js",
-        "src/popup/styles/style.css"
-      ],
-      "matches": ["<all_urls>"]
-    }
-  ],
   "content_security_policy": {
-    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+    "extension_pages": "script-src 'self'; object-src 'self'"
   },
   "background": {
     "service_worker": "src/background/background.js",

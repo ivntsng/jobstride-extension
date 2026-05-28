@@ -4,8 +4,6 @@ window.AUTH_CONFIG = window.AUTH_CONFIG || {
   supabaseStorageKey: '',
 };
 
-let _currentToken: string | null = null;
-
 const escapeContentHtml = (value: string): string =>
   value.replace(
     /[&<>"']/g,
@@ -20,6 +18,20 @@ const escapeContentHtml = (value: string): string =>
         }) as Record<string, string>
       )[char] || char,
   );
+
+const isContentAuthError = (error: any): boolean => {
+  if (!error) return false;
+
+  const message = error.message || error.error || String(error);
+  return (
+    /AUTH_REQUIRED/.test(message) ||
+    /\b401\b/.test(message) ||
+    /\b403\b/.test(message) ||
+    /unauthorized/i.test(message) ||
+    /unauthenticated/i.test(message) ||
+    /token.?expired/i.test(message)
+  );
+};
 
 const showContentToast = (
   type: 'success' | 'error',
@@ -69,18 +81,6 @@ const showContentToast = (
     }
   }, 4000);
 };
-
-chrome.runtime.onMessage.addListener(
-  (message: ChromeMessage, _sender, _sendResponse) => {
-    if (message.type === 'AUTH_STATE_CHANGED') {
-      _currentToken = message.token || null;
-      const modal = document.getElementById('job-tracker-modal');
-      if (modal) {
-        initializeModalFunctionality(modal);
-      }
-    }
-  },
-);
 
 /*******************************
  *  Modal Functionality
@@ -141,75 +141,37 @@ async function initializeModalFunctionality(modal: HTMLElement): Promise<void> {
     submitBtn.textContent = 'Saving...';
 
     try {
-      // Get access token using Auth service
-      const accessToken = await window.Auth.getAccessToken();
-
-      if (!accessToken) {
-        showContentToast(
-          'error',
-          'Authentication Required',
-          'Please login via the extension popup first',
-        );
-        return;
-      }
-
       const jobData: JobApplication = {
-        dashboard_id: (
-          document.getElementById('dashboardName') as HTMLSelectElement
+        dashboard_id: getModalFormControl<HTMLSelectElement>(
+          modal,
+          '#dashboardName',
         ).value.trim(),
-        company: (
-          document.getElementById('company') as HTMLInputElement
+        company: getModalFormControl<HTMLInputElement>(
+          modal,
+          '#company',
         ).value.trim(),
-        position: (
-          document.getElementById('position') as HTMLInputElement
+        position: getModalFormControl<HTMLInputElement>(
+          modal,
+          '#position',
         ).value.trim(),
-        location: (
-          document.getElementById('location') as HTMLInputElement
+        location: getModalFormControl<HTMLInputElement>(
+          modal,
+          '#location',
         ).value.trim(),
-        url: (document.getElementById('url') as HTMLInputElement).value.trim(),
-        salary_range: (
-          document.getElementById('salaryRange') as HTMLInputElement
+        url: getModalFormControl<HTMLInputElement>(modal, '#url').value.trim(),
+        salary_range: getModalFormControl<HTMLInputElement>(
+          modal,
+          '#salaryRange',
         ).value.trim(),
-        description: (
-          document.getElementById('jobDescription') as HTMLTextAreaElement
+        description: getModalFormControl<HTMLTextAreaElement>(
+          modal,
+          '#jobDescription',
         ).value.trim(),
         status: 'saved',
         applied_date: null,
       };
 
-      const response = await chrome.runtime.sendMessage({
-        type: 'FETCH_REQUEST',
-        config: {
-          url: `${window.AUTH_CONFIG.apiBaseUrl}/jobs`,
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-            Authorization: `Bearer ${accessToken}`,
-          },
-          body: JSON.stringify(jobData),
-        },
-      });
-
-      if (!response.success) {
-        if (
-          response.error &&
-          (response.error.includes('token') ||
-            response.error.includes('auth') ||
-            response.error.includes('expired'))
-        ) {
-          // Trigger a re-login or token refresh
-          await chrome.runtime.sendMessage({ type: 'REFRESH_TOKEN' });
-          showContentToast(
-            'error',
-            'Session Expired',
-            'Your session has expired. Please login again.',
-          );
-          return;
-        }
-
-        throw new Error(response.error || 'Failed to save job');
-      }
+      await window.Auth.saveJob(jobData);
 
       showContentToast(
         'success',
@@ -217,7 +179,16 @@ async function initializeModalFunctionality(modal: HTMLElement): Promise<void> {
         'Job information saved successfully',
       );
       closeJobTrackerModal(modal);
-    } catch (_error) {
+    } catch (error) {
+      if (isContentAuthError(error)) {
+        showContentToast(
+          'error',
+          'Authentication Required',
+          'Please open JobStride and log in, then try again.',
+        );
+        return;
+      }
+
       showContentToast(
         'error',
         'Error',
@@ -310,6 +281,17 @@ function convertHtmlToText(html: string): string {
 
 window.convertHtmlToText = convertHtmlToText;
 
+function getModalFormControl<
+  T extends HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement,
+>(modal: HTMLElement, selector: string): T {
+  const control = modal.querySelector<T>(selector);
+  if (!control) {
+    throw new Error(`Missing modal form control: ${selector}`);
+  }
+
+  return control;
+}
+
 function createFloatingButton(jobSite: JobSite): void {
   if (document.getElementById('job-tracker-btn')) {
     return;
@@ -347,17 +329,17 @@ function createFloatingButton(jobSite: JobSite): void {
       };
     }
 
-    (modal.querySelector('#position') as HTMLInputElement).value =
+    getModalFormControl<HTMLInputElement>(modal, '#position').value =
       jobDetails.position || '';
-    (modal.querySelector('#company') as HTMLInputElement).value =
+    getModalFormControl<HTMLInputElement>(modal, '#company').value =
       jobDetails.company || '';
-    (modal.querySelector('#location') as HTMLInputElement).value =
+    getModalFormControl<HTMLInputElement>(modal, '#location').value =
       jobDetails.location || '';
-    (modal.querySelector('#url') as HTMLInputElement).value =
+    getModalFormControl<HTMLInputElement>(modal, '#url').value =
       jobDetails.url || '';
-    (modal.querySelector('#jobDescription') as HTMLTextAreaElement).value =
+    getModalFormControl<HTMLTextAreaElement>(modal, '#jobDescription').value =
       jobDetails.jobDescription || '';
-    (modal.querySelector('#salaryRange') as HTMLInputElement).value =
+    getModalFormControl<HTMLInputElement>(modal, '#salaryRange').value =
       jobDetails.salaryRange || '';
 
     openJobTrackerModal(modal);
@@ -366,9 +348,9 @@ function createFloatingButton(jobSite: JobSite): void {
   const closeBtn = modal.querySelector(
     '.jobstride-dialog-close',
   ) as HTMLElement;
-  closeBtn.onclick = () => {
+  closeBtn.addEventListener('click', () => {
     closeJobTrackerModal(modal);
-  };
+  });
 
   const cancelBtn = modal.querySelector('.jobstride-dialog-cancel');
   cancelBtn?.addEventListener('click', () => {

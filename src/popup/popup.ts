@@ -4,34 +4,12 @@ window.AUTH_CONFIG = window.AUTH_CONFIG || {
   supabaseStorageKey: '',
 };
 
-const sendApiRequest = async (config: {
-  url: string;
-  method: string;
-  headers: Record<string, string>;
-  body?: string;
-}): Promise<{ success: boolean; data?: any; error?: string }> => {
-  return new Promise((resolve) => {
-    chrome.runtime.sendMessage(
-      { type: 'FETCH_REQUEST', config },
-      (response) => {
-        if (chrome.runtime.lastError) {
-          resolve({
-            success: false,
-            error: chrome.runtime.lastError.message || 'Unknown error',
-          });
-        } else {
-          resolve(response || { success: false, error: 'No response' });
-        }
-      },
-    );
-  });
-};
-
 const isAuthError = (error: any): boolean => {
   if (!error) return false;
 
   const message = error.message || error.error || String(error);
   const authPatterns = [
+    /AUTH_REQUIRED/,
     /\b401\b/,
     /\b403\b/,
     /unauthorized/i,
@@ -293,32 +271,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     try {
-      const accessToken = await window.Auth.getAccessToken();
-      if (!accessToken) {
-        await window.Auth.logout();
-        window.location.reload();
-        return;
-      }
-
-      const response = await sendApiRequest({
-        url: `${window.AUTH_CONFIG.apiBaseUrl}/jobs`,
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify(jobData),
-      });
-
-      if (!response.success) {
-        if (isAuthError({ message: response.error })) {
-          await window.Auth.logout();
-          window.location.reload();
-          return;
-        }
-        throw new Error(response.error || 'Failed to save job');
-      }
+      await window.Auth.saveJob(jobData);
 
       showPopupToast(
         'success',
@@ -328,7 +281,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       await chrome.storage.local.remove('formData');
       form.reset();
-    } catch (_error) {
+    } catch (error) {
+      if (isAuthError(error)) {
+        await window.Auth.logout();
+        window.location.reload();
+        return;
+      }
+
       showPopupToast('error', 'Error', 'Failed to save job. Please try again.');
     } finally {
       submitBtn.disabled = false;
@@ -392,34 +351,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       ).value.trim();
 
       try {
-        const accessToken = await window.Auth.getAccessToken();
-        if (!accessToken) {
-          await window.Auth.logout();
-          window.location.reload();
-          return;
-        }
-
-        const response = await sendApiRequest({
-          url: `${window.AUTH_CONFIG.apiBaseUrl}/dashboards/`,
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-            Authorization: `Bearer ${accessToken}`,
-          },
-          body: JSON.stringify({ name: newDashboardName }),
-        });
-
-        if (!response.success) {
-          if (isAuthError({ message: response.error })) {
-            await window.Auth.logout();
-            window.location.reload();
-            return;
-          }
-          throw new Error(response.error || 'Failed to create dashboard');
-        }
-
-        const newDashboard = response.data;
+        const newDashboard =
+          await window.Auth.createDashboard(newDashboardName);
 
         const option = new Option(newDashboard.name, newDashboard.id);
         dashboardSelect.add(option);
@@ -433,7 +366,13 @@ document.addEventListener('DOMContentLoaded', async () => {
           'Dashboard Created',
           `"${newDashboard.name}" has been created successfully`,
         );
-      } catch (_error) {
+      } catch (error) {
+        if (isAuthError(error)) {
+          await window.Auth.logout();
+          window.location.reload();
+          return;
+        }
+
         showPopupToast(
           'error',
           'Error',
