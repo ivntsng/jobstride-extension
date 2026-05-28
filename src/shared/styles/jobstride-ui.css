@@ -528,3 +528,27 @@
     animation-duration: 1.2s;
   }
 }
+
+#job-tracker-modal .jobstride-dialog-panel,
+#job-tracker-modal .jobstride-dialog-panel * {
+  box-sizing: border-box;
+  letter-spacing: 0;
+}
+
+#job-tracker-modal .jobstride-dialog-panel {
+  font-family: var(--jobstride-font);
+  color: var(--jobstride-foreground);
+  line-height: 1.5;
+}
+
+#job-tracker-modal .jobstride-field,
+#job-tracker-modal .jobstride-label {
+  margin: 0;
+  padding: 0;
+}
+
+#job-tracker-modal .jobstride-control,
+#job-tracker-modal .jobstride-button,
+#job-tracker-modal .jobstride-icon-button {
+  font-family: var(--jobstride-font);
+}

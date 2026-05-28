@@ -6,8 +6,8 @@ function createModalForm(): HTMLElement {
   modal.setAttribute('aria-modal', 'true');
   modal.setAttribute('aria-labelledby', 'job-tracker-modal-title');
   modal.innerHTML = `
-    <div class="modal-content jobstride-dialog-panel">
-      <div class="modal-header jobstride-dialog-header">
+    <div class="jobstride-dialog-panel">
+      <div class="jobstride-dialog-header">
         <div class="jobstride-brand">
           <span class="jobstride-brand-mark" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none">
@@ -21,7 +21,7 @@ function createModalForm(): HTMLElement {
             <p class="jobstride-subtitle">Track this job</p>
           </div>
         </div>
-        <button class="close jobstride-icon-button" type="button" aria-label="Close">
+        <button class="jobstride-dialog-close jobstride-icon-button" type="button" aria-label="Close">
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <path d="M18 6 6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
           </svg>
@@ -30,41 +30,41 @@ function createModalForm(): HTMLElement {
       <form id="job-form-modal" class="jobstride-form">
         <div class="jobstride-dialog-body">
           <div class="jobstride-form-grid">
-            <div class="form-group jobstride-field">
+            <div class="jobstride-field">
               <label class="jobstride-label" for="dashboardName">Select Dashboard</label>
               <select id="dashboardName" class="jobstride-control jobstride-select" required>
                 <option value="" disabled selected>Choose a dashboard...</option>
               </select>
             </div>
-            <div class="form-group jobstride-field">
+            <div class="jobstride-field">
               <label class="jobstride-label" for="company">Company</label>
               <input type="text" id="company" class="jobstride-control" placeholder="e.g. Acme Inc." required />
             </div>
-            <div class="form-group jobstride-field">
+            <div class="jobstride-field">
               <label class="jobstride-label" for="position">Position</label>
               <input type="text" id="position" class="jobstride-control" placeholder="e.g. Senior Product Manager" required />
             </div>
-            <div class="form-group jobstride-field">
+            <div class="jobstride-field">
               <label class="jobstride-label" for="location">Location</label>
               <input type="text" id="location" class="jobstride-control" placeholder="e.g. Remote or New York, NY" required />
             </div>
-            <div class="form-group jobstride-field jobstride-field--full">
+            <div class="jobstride-field jobstride-field--full">
               <label class="jobstride-label" for="jobDescription">Job Description</label>
               <textarea id="jobDescription" class="jobstride-control jobstride-textarea" placeholder="Add notes about the role, requirements, etc."></textarea>
             </div>
-            <div class="form-group jobstride-field jobstride-field--full">
+            <div class="jobstride-field jobstride-field--full">
               <label class="jobstride-label" for="url">Job URL</label>
               <input type="url" id="url" class="jobstride-control" placeholder="https://jobboard.com/jobs/12345" />
             </div>
-            <div class="form-group jobstride-field jobstride-field--full">
+            <div class="jobstride-field jobstride-field--full">
               <label class="jobstride-label" for="salaryRange">Salary Range</label>
               <input type="text" id="salaryRange" class="jobstride-control" placeholder="e.g. $120,000 - $150,000" />
             </div>
           </div>
         </div>
-        <div class="form-actions jobstride-dialog-footer">
+        <div class="jobstride-dialog-footer">
           <button type="button" class="jobstride-dialog-cancel jobstride-button jobstride-button--secondary">Cancel</button>
-          <button type="submit" class="btn-primary jobstride-button jobstride-button--primary">
+          <button type="submit" class="jobstride-button jobstride-button--primary">
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="M6 4.5h12v15l-6-3.5-6 3.5v-15Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
             </svg>

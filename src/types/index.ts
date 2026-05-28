@@ -72,7 +72,7 @@ export interface RequestConfig {
 export interface JobSiteHandler {
   getSelectors(): JobSelectors;
   isJobPage(): Promise<boolean>;
-  extractJobDetails(): JobDetails;
+  extractJobDetails(): JobDetails | Promise<JobDetails>;
 }
 
 export interface SiteConfig {

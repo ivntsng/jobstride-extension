@@ -41,14 +41,14 @@ const showContentToast = (
       : '<path d="M12 8v5M12 16h.01" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" />';
 
   toast.innerHTML = `
-    <div class="toast-icon jobstride-toast-icon" aria-hidden="true">
+    <div class="jobstride-toast-icon" aria-hidden="true">
       <svg viewBox="0 0 24 24" fill="none">${icon}</svg>
     </div>
-    <div class="toast-content jobstride-toast-content">
-      <div class="toast-title jobstride-toast-title">${escapeContentHtml(title)}</div>
-      <div class="toast-message jobstride-toast-message">${escapeContentHtml(message)}</div>
+    <div class="jobstride-toast-content">
+      <div class="jobstride-toast-title">${escapeContentHtml(title)}</div>
+      <div class="jobstride-toast-message">${escapeContentHtml(message)}</div>
     </div>
-    <button class="toast-close jobstride-toast-close jobstride-icon-button" aria-label="Dismiss notification">
+    <button class="jobstride-toast-close jobstride-icon-button" aria-label="Dismiss notification">
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path d="M18 6 6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
       </svg>
@@ -57,14 +57,14 @@ const showContentToast = (
 
   document.body.appendChild(toast);
 
-  const closeBtn = toast.querySelector('.toast-close');
+  const closeBtn = toast.querySelector('.jobstride-toast-close');
   closeBtn?.addEventListener('click', () => {
-    toast.classList.add('hiding');
+    toast.classList.add('jobstride-toast--hiding');
     setTimeout(() => toast.remove(), 300);
   });
   setTimeout(() => {
     if (toast.parentElement) {
-      toast.classList.add('hiding');
+      toast.classList.add('jobstride-toast--hiding');
       setTimeout(() => toast.remove(), 300);
     }
   }, 4000);
@@ -331,8 +331,21 @@ function createFloatingButton(jobSite: JobSite): void {
 
   const modal = window.createModalForm();
 
-  button.addEventListener('click', () => {
-    const jobDetails = jobSite.extractJobDetails();
+  button.addEventListener('click', async () => {
+    let jobDetails: JobDetails;
+
+    try {
+      jobDetails = await Promise.resolve(jobSite.extractJobDetails());
+    } catch {
+      jobDetails = {
+        company: '',
+        position: '',
+        location: '',
+        url: window.location.href,
+        jobDescription: '',
+        salaryRange: '',
+      };
+    }
 
     (modal.querySelector('#position') as HTMLInputElement).value =
       jobDetails.position || '';
@@ -350,7 +363,9 @@ function createFloatingButton(jobSite: JobSite): void {
     openJobTrackerModal(modal);
   });
 
-  const closeBtn = modal.querySelector('.close') as HTMLElement;
+  const closeBtn = modal.querySelector(
+    '.jobstride-dialog-close',
+  ) as HTMLElement;
   closeBtn.onclick = () => {
     closeJobTrackerModal(modal);
   };
