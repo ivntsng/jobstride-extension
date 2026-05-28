@@ -5,7 +5,7 @@ abstract class JobSite {
     return Promise.resolve(false);
   }
 
-  extractJobDetails(): JobDetails {
+  extractJobDetails(): JobDetails | Promise<JobDetails> {
     return {
       company: '',
       position: '',

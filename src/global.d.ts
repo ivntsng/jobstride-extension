@@ -72,7 +72,7 @@ interface RequestConfig {
 interface JobSiteHandler {
   getSelectors(): JobSelectors;
   isJobPage(): Promise<boolean>;
-  extractJobDetails(): JobDetails;
+  extractJobDetails(): JobDetails | Promise<JobDetails>;
 }
 
 interface SiteConfig {
