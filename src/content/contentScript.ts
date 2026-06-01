@@ -439,6 +439,51 @@ function initializeJobTracker(): void {
   }
 }
 
+let routeCheckScheduled = false;
+let lastKnownUrl = window.location.href;
+
+function checkForClientSideNavigation(): void {
+  if (window.location.href === lastKnownUrl) {
+    return;
+  }
+
+  lastKnownUrl = window.location.href;
+  scheduleJobTrackerRouteCheck();
+}
+
+function scheduleJobTrackerRouteCheck(): void {
+  if (routeCheckScheduled) {
+    return;
+  }
+
+  routeCheckScheduled = true;
+  setTimeout(() => {
+    routeCheckScheduled = false;
+    initializeJobTracker();
+  }, 0);
+}
+
+function watchClientSideNavigation(): void {
+  const originalPushState = window.history.pushState.bind(window.history);
+  const originalReplaceState = window.history.replaceState.bind(window.history);
+
+  window.history.pushState = (...args: Parameters<History['pushState']>) => {
+    originalPushState(...args);
+    checkForClientSideNavigation();
+  };
+
+  window.history.replaceState = (
+    ...args: Parameters<History['replaceState']>
+  ) => {
+    originalReplaceState(...args);
+    checkForClientSideNavigation();
+  };
+
+  window.addEventListener('popstate', checkForClientSideNavigation);
+  window.addEventListener('hashchange', checkForClientSideNavigation);
+  setInterval(checkForClientSideNavigation, 500);
+}
+
 const observer = new MutationObserver((mutations) => {
   if (document.getElementById('job-tracker-btn')) {
     return;
@@ -471,4 +516,5 @@ observer.observe(document.body, {
   characterData: false,
 });
 
+watchClientSideNavigation();
 initializeJobTracker();
