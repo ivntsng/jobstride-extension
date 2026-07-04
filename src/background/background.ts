@@ -10,20 +10,37 @@ interface BackgroundResponse<T = any> {
   error?: string;
 }
 
-const API_ORIGINS = new Set([
-  'https://api.jobstride.app',
-  'http://localhost:8080',
-  'https://localhost:8080',
-]);
-const WEB_APP_ORIGINS = new Set([
-  'https://jobstride.app',
-  'http://localhost:5173',
-  'https://localhost:5173',
-]);
+interface ApiRequest {
+  path: '/dashboards/' | '/jobs/';
+  method: 'GET' | 'POST';
+  body?: unknown;
+  treatConflictAsSuccess?: boolean;
+}
 
-const DEFAULT_API_ORIGIN = 'https://api.jobstride.app';
-const DEFAULT_WEB_APP_ORIGIN = 'https://jobstride.app';
+const API_ORIGIN_LIST = 'https://api.jobstride.app';
+const WEB_APP_ORIGIN_LIST = 'https://jobstride.app';
+const API_ORIGINS = new Set(parseOriginList(API_ORIGIN_LIST));
+const WEB_APP_ORIGINS = new Set(parseOriginList(WEB_APP_ORIGIN_LIST));
+const DEFAULT_API_ORIGIN = getFirstOrigin(
+  API_ORIGIN_LIST,
+  'https://api.jobstride.app',
+);
+const DEFAULT_WEB_APP_ORIGIN = getFirstOrigin(
+  WEB_APP_ORIGIN_LIST,
+  'https://jobstride.app',
+);
 const SUPABASE_STORAGE_KEY = 'sb-bxxojrwocxrehaodlesq-auth-token';
+
+function parseOriginList(originList: string): string[] {
+  return originList
+    .split('|')
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+}
+
+function getFirstOrigin(originList: string, fallback: string): string {
+  return parseOriginList(originList)[0] || fallback;
+}
 
 void chrome.storage.session
   .setAccessLevel({
@@ -75,10 +92,12 @@ async function handleMessage(
     case 'SAVE_JOB': {
       const jobData = normalizeJobApplication(message.jobData);
       const data = await fetchApi(message.apiBaseUrl, message.webAppUrl, {
-        path: '/jobs',
+        path: '/jobs/',
         method: 'POST',
         body: jobData,
+        treatConflictAsSuccess: true,
       });
+      await notifyJobStrideTabs(message.webAppUrl, jobData.dashboard_id);
       return { success: true, data };
     }
     case 'OPEN_LOGIN': {
@@ -112,11 +131,7 @@ async function handleMessage(
 async function fetchApi(
   apiBaseUrl: unknown,
   webAppUrl: unknown,
-  request: {
-    path: '/dashboards/' | '/jobs';
-    method: 'GET' | 'POST';
-    body?: unknown;
-  },
+  request: ApiRequest,
 ): Promise<any> {
   const auth = await ensureAuth(webAppUrl);
   if (!auth) {
@@ -137,18 +152,30 @@ async function fetchApi(
     init.body = JSON.stringify(request.body);
   }
 
-  const response = await fetch(`${apiOrigin}${request.path}`, init);
+  let response: Response;
+  try {
+    response = await fetch(`${apiOrigin}${request.path}`, init);
+  } catch {
+    throw new Error('NETWORK_ERROR');
+  }
 
   if (response.status === 401 || response.status === 403) {
     await clearStoredAuth();
     throw new Error('AUTH_REQUIRED');
   }
 
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+  if (request.treatConflictAsSuccess && response.status === 409) {
+    return {
+      duplicate: true,
+      message: (await getResponseErrorMessage(response)) || 'Job already saved',
+    };
   }
 
-  return await response.json();
+  if (!response.ok) {
+    throw new Error(await getApiErrorMessage(response));
+  }
+
+  return await readJsonResponse(response);
 }
 
 async function ensureAuth(webAppUrl: unknown): Promise<StoredAuth | null> {
@@ -180,6 +207,117 @@ async function storeAuth(auth: StoredAuth): Promise<void> {
 async function clearStoredAuth(): Promise<void> {
   await chrome.storage.session.remove('auth');
   await chrome.storage.local.remove('auth');
+}
+
+async function notifyJobStrideTabs(
+  webAppUrl: unknown,
+  dashboardId: string,
+): Promise<void> {
+  const webAppOrigin = getAllowedWebAppOrigin(webAppUrl);
+
+  try {
+    const tabs = await chrome.tabs.query({ url: `${webAppOrigin}/*` });
+    await Promise.all(
+      tabs.map(async (tab) => {
+        if (typeof tab.id !== 'number') return;
+
+        const tabUrl = tab.url || '';
+        if (!tabUrl.startsWith(`${webAppOrigin}/dashboard/${dashboardId}`)) {
+          return;
+        }
+
+        await chrome.scripting.executeScript({
+          target: { tabId: tab.id },
+          world: 'MAIN',
+          func: () => {
+            window.dispatchEvent(new Event('jobstride:jobs-updated'));
+          },
+        });
+      }),
+    );
+  } catch {}
+}
+
+async function getApiErrorMessage(response: Response): Promise<string> {
+  const message = await getResponseErrorMessage(response);
+
+  if (response.status === 404) {
+    return withOptionalDetail('DASHBOARD_NOT_FOUND', message);
+  }
+
+  if (response.status === 409) {
+    return withOptionalDetail('JOB_ALREADY_SAVED', message);
+  }
+
+  if (response.status === 422) {
+    return withOptionalDetail('VALIDATION_ERROR', message);
+  }
+
+  if (response.status >= 500) {
+    return withOptionalDetail('SERVER_ERROR', message);
+  }
+
+  return withOptionalDetail(`HTTP_${response.status}`, message);
+}
+
+function withOptionalDetail(code: string, detail: string): string {
+  return detail ? `${code}: ${detail}` : code;
+}
+
+async function getResponseErrorMessage(response: Response): Promise<string> {
+  const data = await readJsonResponse(response);
+  return extractErrorMessage(data);
+}
+
+async function readJsonResponse(response: Response): Promise<any> {
+  try {
+    return await response.json();
+  } catch {
+    return null;
+  }
+}
+
+function extractErrorMessage(value: unknown): string {
+  if (typeof value === 'string') {
+    return value.trim();
+  }
+
+  if (Array.isArray(value)) {
+    return value.map(extractErrorMessage).filter(Boolean).join('; ');
+  }
+
+  if (!value || typeof value !== 'object') {
+    return '';
+  }
+
+  const error = value as Record<string, unknown>;
+  for (const key of ['detail', 'message', 'error']) {
+    const message = extractErrorMessage(error[key]);
+    if (message) return message;
+  }
+
+  if (error.errors) {
+    return extractErrorMessage(error.errors);
+  }
+
+  if (typeof error.msg === 'string') {
+    const location = Array.isArray(error.loc)
+      ? error.loc
+          .filter(
+            (part) => typeof part === 'string' || typeof part === 'number',
+          )
+          .join('.')
+      : '';
+    return location ? `${location}: ${error.msg}` : error.msg;
+  }
+
+  return Object.entries(error)
+    .map(([field, detail]) => {
+      const message = extractErrorMessage(detail);
+      return message ? `${field}: ${message}` : '';
+    })
+    .filter(Boolean)
+    .join('; ');
 }
 
 function normalizeStoredAuth(value: unknown): StoredAuth | null {
@@ -359,7 +497,7 @@ function normalizeJobApplication(value: unknown): JobApplication {
     company: normalizeRequiredString(job.company, 'company'),
     position: normalizeRequiredString(job.position, 'position'),
     location: normalizeOptionalString(job.location),
-    url: normalizeRequiredString(job.url, 'url'),
+    url: normalizeOptionalString(job.url),
     salary_range: normalizeOptionalString(job.salary_range),
     description: normalizeOptionalString(job.description),
     status: 'saved',

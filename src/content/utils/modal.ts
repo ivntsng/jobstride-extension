@@ -46,7 +46,7 @@ function createModalForm(): HTMLElement {
             </div>
             <div class="jobstride-field">
               <label class="jobstride-label" for="location">Location</label>
-              <input type="text" id="location" class="jobstride-control" placeholder="e.g. Remote or New York, NY" required />
+              <input type="text" id="location" class="jobstride-control" placeholder="e.g. Remote or New York, NY" />
             </div>
             <div class="jobstride-field jobstride-field--full">
               <label class="jobstride-label" for="jobDescription">Job Description</label>

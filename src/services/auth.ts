@@ -35,11 +35,25 @@ interface AuthService {
   createDashboard(name: string): Promise<Dashboard>;
 }
 
-const AUTH_ALLOWED_WEB_APP_ORIGINS = new Set([
+const AUTH_ALLOWED_WEB_APP_ORIGIN_LIST = 'https://jobstride.app';
+const AUTH_ALLOWED_WEB_APP_ORIGINS = new Set(
+  parseAuthOriginList(AUTH_ALLOWED_WEB_APP_ORIGIN_LIST),
+);
+const DEFAULT_AUTH_WEB_APP_ORIGIN = getFirstAuthOrigin(
+  AUTH_ALLOWED_WEB_APP_ORIGIN_LIST,
   'https://jobstride.app',
-  'http://localhost:5173',
-  'https://localhost:5173',
-]);
+);
+
+function parseAuthOriginList(originList: string): string[] {
+  return originList
+    .split('|')
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+}
+
+function getFirstAuthOrigin(originList: string, fallback: string): string {
+  return parseAuthOriginList(originList)[0] || fallback;
+}
 
 class Auth implements AuthService {
   private getSupabaseStorageKey(): string {
@@ -67,7 +81,7 @@ class Auth implements AuthService {
     return (
       this.getAllowedWebAppOrigin(
         (window as any).AUTH_CONFIG?.webAppUrl || '',
-      ) || 'https://jobstride.app'
+      ) || DEFAULT_AUTH_WEB_APP_ORIGIN
     );
   }
 

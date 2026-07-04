@@ -1,7 +1,11 @@
+const JOBSTRIDE_DEFAULT_API_BASE_URL = 'https://api.jobstride.app';
+const JOBSTRIDE_DEFAULT_WEB_APP_URL = 'https://jobstride.app';
+const JOBSTRIDE_SUPABASE_STORAGE_KEY = 'sb-bxxojrwocxrehaodlesq-auth-token';
+
 const defaultConfig: EnvConfig = {
-  API_BASE_URL: 'https://api.jobstride.app',
-  WEB_APP_URL: 'https://jobstride.app',
-  SUPABASE_STORAGE_KEY: 'sb-bxxojrwocxrehaodlesq-auth-token',
+  API_BASE_URL: JOBSTRIDE_DEFAULT_API_BASE_URL,
+  WEB_APP_URL: JOBSTRIDE_DEFAULT_WEB_APP_URL,
+  SUPABASE_STORAGE_KEY: JOBSTRIDE_SUPABASE_STORAGE_KEY,
 };
 
 function getEnvVar(_key: keyof EnvConfig, defaultValue: string): string {

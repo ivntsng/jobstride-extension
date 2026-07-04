@@ -4,8 +4,11 @@
   "description": "A Chrome extension to track job applications",
   "scripts": {
     "build": "node build.js",
+    "build:dev": "node build.js --target=development",
+    "build:local": "node build.js --target=local",
     "build:watch": "tsc --watch",
     "dev": "tsc --watch",
+    "test": "node tests/linkedin-detection.test.cjs && node tests/site-detection.test.cjs && node tests/content-ui.test.cjs && node tests/auth-sync.test.cjs && node tests/background-security.test.cjs",
     "clean": "rm -rf dist",
     "prebuild": "bun run clean",
     "type-check": "tsc --noEmit",
@@ -17,8 +20,5 @@
     "@biomejs/biome": "^2.3.8",
     "@types/chrome": "^0.0.254",
     "typescript": "^5.3.0"
-  },
-  "dependencies": {
-    "dotenv": "^16.3.1"
   }
 }
