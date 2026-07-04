@@ -35,23 +35,13 @@ A TypeScript-powered Chrome extension for tracking job applications across multi
    bun install
    ```
 
-4. **Configure environment variables**
-
-   Edit `env.ts` with your API configuration:
-
-   ```env
-   # API Configuration
-   API_BASE_URL=http://localhost:8080
-   WEB_APP_URL=http://localhost:5173
-   ```
-
-5. **Build the extension**
+4. **Build the extension**
 
    ```bash
    bun run build
    ```
 
-6. **Load in Chrome**
+5. **Load in Chrome**
    - Open Chrome and navigate to `chrome://extensions/`
    - Enable **"Developer mode"** (toggle in top right corner)
    - Click **"Load unpacked"**
@@ -65,8 +55,17 @@ A TypeScript-powered Chrome extension for tracking job applications across multi
 # Build extension for production
 bun run build
 
+# Build unpacked extension for local testing against production JobStride
+bun run build:dev
+
+# Build unpacked extension for local API/web app services
+bun run build:local
+
 # Type check without building
 bun run type-check
+
+# Run regression tests
+bun run test
 
 # Watch mode for development (TypeScript compilation)
 bun run dev
@@ -87,7 +86,7 @@ bun run clean
 ### Development Workflow
 
 1. Make changes to TypeScript files in `src/`
-2. Run `bun run build` to compile
+2. Run `bun run build:dev` to test an unpacked extension against production JobStride, or `bun run build:local` to target `localhost:8080` and `localhost:5173`
 3. Reload the extension in Chrome (click reload icon on `chrome://extensions/`)
 4. Test your changes on supported job boards
 

@@ -2,7 +2,7 @@ class Ashby extends JobSite {
   getSelectors(): JobSelectors {
     return {
       jobPage:
-        '._navRoot_1e3cr_29, .ashby-job-posting-header, ._container_ud4nd_29',
+        '.ashby-job-posting-page, [data-testid="job-posting"], .ashby-job-posting-header, ._descriptionText_14ib5_206, .job-description',
       company: '._navLogoWordmarkImage_1e3cr_105',
       title: '._title_ud4nd_34, h2',
       location: '._left_14ib5_426 p, .job-location',
@@ -24,40 +24,68 @@ class Ashby extends JobSite {
       }
 
       const domCheck = (): boolean => {
-        const selectors = [
+        const specificJobSelectors = [
           '.ashby-job-posting-page',
           "[data-testid='job-posting']",
-          '.posting-headline',
+          '[data-testid="job-posting"]',
+          '.ashby-job-posting-header',
+        ];
+        const detailSelectors = [
           '.posting-content',
-          'h1',
-          'h2',
           '.job-description',
-          '.posting-categories',
+          '._descriptionText_14ib5_206',
+        ];
+        const titleSelectors = [
+          '._title_ud4nd_34',
+          '.posting-headline',
+          '[data-testid="job-title"]',
         ];
 
-        for (const selector of selectors) {
-          const element = document.querySelector(selector);
-          if (element) {
-          }
+        if (this.hasStructuredJobPosting()) {
+          return true;
         }
 
-        return selectors.some((selector) => document.querySelector(selector));
+        if (
+          specificJobSelectors.some((selector) =>
+            document.querySelector(selector),
+          )
+        ) {
+          return true;
+        }
+
+        return (
+          detailSelectors.some((selector) =>
+            document.querySelector(selector),
+          ) &&
+          titleSelectors.some((selector) => document.querySelector(selector))
+        );
       };
 
       return new Promise((resolve) => {
-        if (document.readyState === 'complete') {
-          const result = domCheck();
-          resolve(result);
-        } else {
-          window.addEventListener('load', () => {
-            const result = domCheck();
-            resolve(result);
-          });
-        }
+        window.setTimeout(() => resolve(domCheck()), 500);
       });
     }
 
     return Promise.resolve(false);
+  }
+
+  private hasStructuredJobPosting(): boolean {
+    const jsonLdScripts = document.querySelectorAll(
+      'script[type="application/ld+json"]',
+    );
+
+    for (const script of jsonLdScripts) {
+      try {
+        const parsedData = JSON.parse(script.textContent || '');
+        if (parsedData && parsedData['@type'] === 'JobPosting') {
+          return true;
+        }
+      } catch (_error) {
+        // Failed to parse JSON-LD data, continue to next script
+      }
+    }
+
+    return false;
   }
 
   extractJobDetails(): JobDetails {

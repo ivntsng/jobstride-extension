@@ -13,17 +13,35 @@ class Indeed extends JobSite {
   isJobPage(): Promise<boolean> {
     const selectors = this.getSelectors();
     return new Promise((resolve) => {
+      let settled = false;
+      let timeoutId: number | undefined;
       const observer = new MutationObserver(() => {
         if (document.querySelector(selectors.jobPage) !== null) {
-          observer.disconnect();
-          resolve(true);
+          finish(true);
         }
       });
-      observer.observe(document.body, { childList: true, subtree: true });
-      if (document.querySelector(selectors.jobPage) !== null) {
+
+      function finish(isJobPage: boolean): void {
+        if (settled) return;
+
+        settled = true;
         observer.disconnect();
-        resolve(true);
+
+        if (timeoutId !== undefined) {
+          window.clearTimeout(timeoutId);
+        }
+
+        resolve(isJobPage);
       }
+
+      observer.observe(document.body, { childList: true, subtree: true });
+
+      if (document.querySelector(selectors.jobPage) !== null) {
+        finish(true);
+        return;
+      }
+
+      timeoutId = window.setTimeout(() => finish(false), 1500);
     });
   }
 

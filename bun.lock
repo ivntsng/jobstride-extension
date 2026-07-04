@@ -3,9 +3,6 @@
   "workspaces": {
     "": {
       "name": "nextstep-extension",
-      "dependencies": {
-        "dotenv": "^16.3.1"
-      },
       "devDependencies": {
         "@biomejs/biome": "^2.3.8",
         "@types/chrome": "^0.0.254",
@@ -138,12 +135,6 @@
       "",
       {},
       "sha512-fluxdy7ryD3MV6h8pTfTYpy/xQzCFC7m89nOH9y94cNqJ1mDIDPut7MnRHI3F6qRmh/cT2fUjG1MLdCNb4hE9A=="
-    ],
-    "dotenv": [
-      "dotenv@16.6.1",
-      "",
-      {},
-      "sha512-uBq4egWHTcTt33a72vpSG0z3HnPuIl6NqYcTrKEg2azoEyl2hpW0zqlxysq2pK9HlDIHyHyakeYaYnSAwd8bow=="
     ],
     "typescript": [
       "typescript@5.9.3",

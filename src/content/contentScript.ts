@@ -33,6 +33,38 @@ const isContentAuthError = (error: any): boolean => {
   );
 };
 
+const getContentSaveErrorMessage = (error: any): string => {
+  const message = error?.message || error?.error || String(error || '');
+
+  if (/DASHBOARD_NOT_FOUND|\b404\b/.test(message)) {
+    return 'That dashboard is no longer available. Choose another dashboard and try again.';
+  }
+
+  if (/VALIDATION_ERROR|\b422\b/.test(message)) {
+    const detail = message.replace(/^.*VALIDATION_ERROR:?\s*/i, '').trim();
+    return detail
+      ? `Please check the job details: ${detail}`
+      : 'Please check that the required fields are filled in.';
+  }
+
+  if (/JOB_ALREADY_SAVED|\b409\b/.test(message)) {
+    return 'This job is already saved to the selected dashboard.';
+  }
+
+  if (/SERVER_ERROR|\b5\d\d\b/.test(message)) {
+    return 'JobStride had trouble saving this job. Please try again in a moment.';
+  }
+
+  if (/NETWORK_ERROR|failed to fetch|network/i.test(message)) {
+    return 'Could not reach JobStride. Check your connection and try again.';
+  }
+
+  return 'Failed to save job. Please try again.';
+};
+
+const isDuplicateSaveResult = (value: any): boolean =>
+  Boolean(value && typeof value === 'object' && value.duplicate === true);
+
 const showContentToast = (
   type: 'success' | 'error',
   title: string,
@@ -171,29 +203,37 @@ async function initializeModalFunctionality(modal: HTMLElement): Promise<void> {
         applied_date: null,
       };
 
-      await window.Auth.saveJob(jobData);
+      const savedJob = await window.Auth.saveJob(jobData);
 
-      showContentToast(
-        'success',
-        'Success!',
-        'Job information saved successfully',
-      );
+      if (isDuplicateSaveResult(savedJob)) {
+        showContentToast(
+          'success',
+          'Already saved',
+          'This job is already in the selected dashboard.',
+        );
+      } else {
+        showContentToast(
+          'success',
+          'Success!',
+          'Job information saved successfully',
+        );
+      }
       closeJobTrackerModal(modal);
     } catch (error) {
       if (isContentAuthError(error)) {
+        try {
+          await window.Auth.openWebAppLogin();
+        } catch {}
+
         showContentToast(
           'error',
           'Authentication Required',
-          'Please open JobStride and log in, then try again.',
+          'Please log in to JobStride in the opened tab, then try again.',
         );
         return;
       }
 
-      showContentToast(
-        'error',
-        'Error',
-        'Failed to save job. Please try again.',
-      );
+      showContentToast('error', 'Error', getContentSaveErrorMessage(error));
     } finally {
       // Reset button state
       submitBtn.disabled = false;
@@ -209,6 +249,11 @@ function openJobTrackerModal(modal: HTMLElement): void {
 
 function closeJobTrackerModal(modal: HTMLElement): void {
   modal.classList.remove('is-open');
+}
+
+function removeJobTrackerUi(): void {
+  document.getElementById('job-tracker-btn')?.remove();
+  document.getElementById('job-tracker-modal')?.remove();
 }
 
 /*******************************
@@ -376,6 +421,8 @@ function createFloatingButton(jobSite: JobSite): void {
  *  Main Execution
  *******************************/
 function initializeJobTracker(): void {
+  const checkId = ++jobTrackerCheckId;
+  const checkedUrl = window.location.href;
   let jobSite: JobSite | null = null;
   const hostname = window.location.hostname;
 
@@ -429,16 +476,40 @@ function initializeJobTracker(): void {
     }
   }
 
-  if (jobSite) {
-    const site = jobSite;
-    site.isJobPage().then((isJobPage) => {
-      if (isJobPage) {
-        createFloatingButton(site);
+  if (!jobSite) {
+    removeJobTrackerUi();
+    return;
+  }
+
+  const site = jobSite;
+  site
+    .isJobPage()
+    .then((isJobPage) => {
+      if (
+        checkId !== jobTrackerCheckId ||
+        checkedUrl !== window.location.href
+      ) {
+        return;
+      }
+
+      if (!isJobPage) {
+        removeJobTrackerUi();
+        return;
+      }
+
+      createFloatingButton(site);
+    })
+    .catch(() => {
+      if (
+        checkId === jobTrackerCheckId &&
+        checkedUrl === window.location.href
+      ) {
+        removeJobTrackerUi();
       }
     });
-  }
 }
 
+let jobTrackerCheckId = 0;
 let routeCheckScheduled = false;
 let lastKnownUrl = window.location.href;
 

@@ -350,17 +350,8 @@
   padding: 14px 16px;
   background: var(--jobstride-surface);
   border: 1px solid var(--jobstride-border);
-  border-left: 4px solid var(--jobstride-primary);
   border-radius: var(--jobstride-radius-md);
   box-shadow: var(--jobstride-shadow-md);
-}
-
-.jobstride-toast--success {
-  border-left-color: var(--jobstride-success);
-}
-
-.jobstride-toast--error {
-  border-left-color: var(--jobstride-danger);
 }
 
 .jobstride-toast-icon {

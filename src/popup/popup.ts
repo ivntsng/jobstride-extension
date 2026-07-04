@@ -23,6 +23,73 @@ const isAuthError = (error: any): boolean => {
   return authPatterns.some((pattern) => pattern.test(message));
 };
 
+const getPopupSaveErrorMessage = (error: any): string => {
+  const message = error?.message || error?.error || String(error || '');
+
+  if (/DASHBOARD_NOT_FOUND|\b404\b/.test(message)) {
+    return 'That dashboard is no longer available. Choose another dashboard and try again.';
+  }
+
+  if (/VALIDATION_ERROR|\b422\b/.test(message)) {
+    const detail = message.replace(/^.*VALIDATION_ERROR:?\s*/i, '').trim();
+    return detail
+      ? `Please check the job details: ${detail}`
+      : 'Please check that the required fields are filled in.';
+  }
+
+  if (/JOB_ALREADY_SAVED|\b409\b/.test(message)) {
+    return 'This job is already saved to the selected dashboard.';
+  }
+
+  if (/SERVER_ERROR|\b5\d\d\b/.test(message)) {
+    return 'JobStride had trouble saving this job. Please try again in a moment.';
+  }
+
+  if (/NETWORK_ERROR|failed to fetch|network/i.test(message)) {
+    return 'Could not reach JobStride. Check your connection and try again.';
+  }
+
+  return 'Failed to save job. Please try again.';
+};
+
+const getConfiguredApiLabel = (): string => {
+  const apiBaseUrl = window.AUTH_CONFIG?.apiBaseUrl || '';
+  return apiBaseUrl ? ` at ${apiBaseUrl}` : '';
+};
+
+const getPopupDashboardLoadErrorMessage = (error: any): string => {
+  const message = error?.message || error?.error || String(error || '');
+  const apiLabel = getConfiguredApiLabel();
+
+  if (/NETWORK_ERROR|failed to fetch|network/i.test(message)) {
+    const apiBaseUrl = window.AUTH_CONFIG?.apiBaseUrl || '';
+    const localHint = /localhost|127\.0\.0\.1|\[::1\]/i.test(apiBaseUrl)
+      ? ' Start the local API or rebuild with npm run build to use JobStride production.'
+      : '';
+
+    return `Could not reach the JobStride API${apiLabel}.${localHint}`;
+  }
+
+  if (/AUTH_REQUIRED|\b401\b|\b403\b/.test(message)) {
+    return 'Please log in to JobStride, then reopen this extension.';
+  }
+
+  if (/SERVER_ERROR|\b5\d\d\b/.test(message)) {
+    return 'JobStride had trouble loading dashboards. Please try again in a moment.';
+  }
+
+  if (/HTTP_404|\b404\b/.test(message)) {
+    return `Could not find the dashboards endpoint${apiLabel}.`;
+  }
+
+  return message
+    ? `Failed to load dashboards: ${message}`
+    : 'Failed to load dashboards. Please try again.';
+};
+
+const isPopupDuplicateSaveResult = (value: any): boolean =>
+  Boolean(value && typeof value === 'object' && value.duplicate === true);
+
 const escapePopupHtml = (value: string): string =>
   value.replace(
     /[&<>"']/g,
@@ -230,7 +297,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       showPopupToast(
         'error',
         'Error',
-        'Failed to load dashboards. Please try again.',
+        getPopupDashboardLoadErrorMessage(error),
       );
     }
   }
@@ -271,24 +338,35 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     try {
-      await window.Auth.saveJob(jobData);
+      const savedJob = await window.Auth.saveJob(jobData);
 
-      showPopupToast(
-        'success',
-        'Success!',
-        'Job information saved successfully',
-      );
+      if (isPopupDuplicateSaveResult(savedJob)) {
+        showPopupToast(
+          'success',
+          'Already saved',
+          'This job is already in the selected dashboard.',
+        );
+      } else {
+        showPopupToast(
+          'success',
+          'Success!',
+          'Job information saved successfully',
+        );
+      }
 
       await chrome.storage.local.remove('formData');
       form.reset();
     } catch (error) {
       if (isAuthError(error)) {
         await window.Auth.logout();
+        try {
+          await window.Auth.openWebAppLogin();
+        } catch {}
         window.location.reload();
         return;
       }
 
-      showPopupToast('error', 'Error', 'Failed to save job. Please try again.');
+      showPopupToast('error', 'Error', getPopupSaveErrorMessage(error));
     } finally {
       submitBtn.disabled = false;
       submitBtn.classList.remove('loading');
