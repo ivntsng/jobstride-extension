@@ -30,6 +30,7 @@ const DEFAULT_WEB_APP_ORIGIN = getFirstOrigin(
   'https://jobstride.app',
 );
 const SUPABASE_STORAGE_KEY = 'sb-bxxojrwocxrehaodlesq-auth-token';
+const API_REQUEST_TIMEOUT_MS = 15_000;
 
 function parseOriginList(originList: string): string[] {
   return originList
@@ -97,7 +98,7 @@ async function handleMessage(
         body: jobData,
         treatConflictAsSuccess: true,
       });
-      await notifyJobStrideTabs(message.webAppUrl, jobData.dashboard_id);
+      void notifyJobStrideTabs(message.webAppUrl, jobData.dashboard_id);
       return { success: true, data };
     }
     case 'OPEN_LOGIN': {
@@ -152,30 +153,49 @@ async function fetchApi(
     init.body = JSON.stringify(request.body);
   }
 
-  let response: Response;
+  const controller = new AbortController();
+  const timeoutId = setTimeout(
+    () => controller.abort(),
+    API_REQUEST_TIMEOUT_MS,
+  );
+  init.signal = controller.signal;
+
   try {
-    response = await fetch(`${apiOrigin}${request.path}`, init);
-  } catch {
-    throw new Error('NETWORK_ERROR');
-  }
+    let response: Response;
+    try {
+      response = await fetch(`${apiOrigin}${request.path}`, init);
+    } catch {
+      throw new Error(
+        controller.signal.aborted ? 'REQUEST_TIMEOUT' : 'NETWORK_ERROR',
+      );
+    }
 
-  if (response.status === 401 || response.status === 403) {
-    await clearStoredAuth();
-    throw new Error('AUTH_REQUIRED');
-  }
+    if (response.status === 401 || response.status === 403) {
+      await clearStoredAuth();
+      throw new Error('AUTH_REQUIRED');
+    }
 
-  if (request.treatConflictAsSuccess && response.status === 409) {
-    return {
-      duplicate: true,
-      message: (await getResponseErrorMessage(response)) || 'Job already saved',
-    };
-  }
+    if (request.treatConflictAsSuccess && response.status === 409) {
+      return {
+        duplicate: true,
+        message:
+          (await getResponseErrorMessage(response)) || 'Job already saved',
+      };
+    }
 
-  if (!response.ok) {
-    throw new Error(await getApiErrorMessage(response));
-  }
+    if (!response.ok) {
+      throw new Error(await getApiErrorMessage(response));
+    }
 
-  return await readJsonResponse(response);
+    return await readJsonResponse(response);
+  } catch (error) {
+    if (controller.signal.aborted) {
+      throw new Error('REQUEST_TIMEOUT');
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeoutId);
+  }
 }
 
 async function ensureAuth(webAppUrl: unknown): Promise<StoredAuth | null> {
@@ -230,7 +250,9 @@ async function notifyJobStrideTabs(
           target: { tabId: tab.id },
           world: 'MAIN',
           func: () => {
-            window.dispatchEvent(new Event('jobstride:jobs-updated'));
+            setTimeout(() => {
+              window.dispatchEvent(new Event('jobstride:jobs-updated'));
+            }, 0);
           },
         });
       }),

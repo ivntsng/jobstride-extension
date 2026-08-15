@@ -51,6 +51,10 @@ const getContentSaveErrorMessage = (error: any): string => {
     return 'This job is already saved to the selected dashboard.';
   }
 
+  if (/REQUEST_TIMEOUT/.test(message)) {
+    return 'JobStride took too long to respond. Please try saving again.';
+  }
+
   if (/SERVER_ERROR|\b5\d\d\b/.test(message)) {
     return 'JobStride had trouble saving this job. Please try again in a moment.';
   }
