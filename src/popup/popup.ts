@@ -41,6 +41,10 @@ const getPopupSaveErrorMessage = (error: any): string => {
     return 'This job is already saved to the selected dashboard.';
   }
 
+  if (/REQUEST_TIMEOUT/.test(message)) {
+    return 'JobStride took too long to respond. Please try saving again.';
+  }
+
   if (/SERVER_ERROR|\b5\d\d\b/.test(message)) {
     return 'JobStride had trouble saving this job. Please try again in a moment.';
   }
@@ -68,6 +72,10 @@ const getPopupDashboardLoadErrorMessage = (error: any): string => {
       : '';
 
     return `Could not reach the JobStride API${apiLabel}.${localHint}`;
+  }
+
+  if (/REQUEST_TIMEOUT/.test(message)) {
+    return `The JobStride API${apiLabel} took too long to respond. Please try again.`;
   }
 
   if (/AUTH_REQUIRED|\b401\b|\b403\b/.test(message)) {
