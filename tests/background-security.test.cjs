@@ -335,6 +335,68 @@ async function run() {
   }
 
   {
+    let resolveNotification;
+    let markNotificationStarted;
+    const notificationStarted = new Promise((resolve) => {
+      markNotificationStarted = resolve;
+    });
+    const background = loadBackground({
+      tabs: [{ id: 8, url: 'https://jobstride.app/dashboard/dashboard-1' }],
+      sessionAuth: {
+        accessToken: 'stored-access-token',
+        expiresAt: futureExpiresAt,
+      },
+      fetchResponse: {
+        ok: true,
+        status: 201,
+        json: async () => ({ id: 'job-1', dashboard_id: 'dashboard-1' }),
+      },
+      executeScript: async () => {
+        markNotificationStarted();
+        return await new Promise((resolve) => {
+          resolveNotification = resolve;
+        });
+      },
+    });
+
+    let saveResponded = false;
+    const saveResponse = background
+      .sendMessage({
+        type: 'SAVE_JOB',
+        apiBaseUrl: 'https://api.jobstride.app',
+        webAppUrl: 'https://jobstride.app',
+        jobData: {
+          dashboard_id: 'dashboard-1',
+          company: 'Acme',
+          position: 'Engineer',
+          location: '',
+          url: 'https://example.com/job',
+          salary_range: '',
+          description: '',
+          status: 'saved',
+          applied_date: null,
+        },
+      })
+      .then((response) => {
+        saveResponded = true;
+        return response;
+      });
+
+    await notificationStarted;
+    await Promise.resolve();
+    assert.equal(
+      saveResponded,
+      false,
+      'save response waits for dashboard notification delivery',
+    );
+
+    resolveNotification([]);
+    const response = await saveResponse;
+    assert.equal(response.success, true);
+    assert.equal(response.data.id, 'job-1');
+  }
+
+  {
     const background = loadBackground({
       tabs: [{ id: 8, url: 'https://jobstride.app/dashboard/dashboard-1' }],
       sessionAuth: {
