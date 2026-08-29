@@ -327,6 +327,23 @@ async function run() {
     assert.equal(background.calls.executeScript.length, 1);
     assert.equal(background.calls.executeScript[0].target.tabId, 8);
     assert.equal(background.calls.executeScript[0].world, 'MAIN');
+    const dispatchedEvents = [];
+    vm.runInNewContext(
+      `(${background.calls.executeScript[0].func.toString()})()`,
+      {
+        Event: class {
+          constructor(type) {
+            this.type = type;
+          }
+        },
+        window: {
+          dispatchEvent(event) {
+            dispatchedEvents.push(event.type);
+          },
+        },
+      },
+    );
+    assert.deepEqual(dispatchedEvents, ['jobstride:jobs-updated']);
     assert.equal(JSON.parse(background.calls.fetch[0][1].body).status, 'saved');
     assert.equal(
       JSON.parse(background.calls.fetch[0][1].body).applied_date,
@@ -409,6 +426,17 @@ async function run() {
         json: async () => ({ id: 'job-1', dashboard_id: 'dashboard-1' }),
       },
       executeScript: async () => new Promise(() => {}),
+      timerSetTimeout(callback, delay) {
+        if (delay === 250) {
+          queueMicrotask(callback);
+          return 1;
+        }
+
+        return setTimeout(callback, delay);
+      },
+      timerClearTimeout(id) {
+        if (typeof id === 'object') clearTimeout(id);
+      },
     });
 
     const saveResponse = background.sendMessage({

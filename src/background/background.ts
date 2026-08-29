@@ -31,6 +31,7 @@ const DEFAULT_WEB_APP_ORIGIN = getFirstOrigin(
 );
 const SUPABASE_STORAGE_KEY = 'sb-bxxojrwocxrehaodlesq-auth-token';
 const API_REQUEST_TIMEOUT_MS = 15_000;
+const JOB_UPDATE_NOTIFICATION_TIMEOUT_MS = 250;
 
 function parseOriginList(originList: string): string[] {
   return originList
@@ -98,7 +99,7 @@ async function handleMessage(
         body: jobData,
         treatConflictAsSuccess: true,
       });
-      void notifyJobStrideTabs(message.webAppUrl, jobData.dashboard_id);
+      await notifyJobStrideTabs(message.webAppUrl, jobData.dashboard_id);
       return { success: true, data };
     }
     case 'OPEN_LOGIN': {
@@ -234,30 +235,46 @@ async function notifyJobStrideTabs(
   dashboardId: string,
 ): Promise<void> {
   const webAppOrigin = getAllowedWebAppOrigin(webAppUrl);
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
 
   try {
-    const tabs = await chrome.tabs.query({ url: `${webAppOrigin}/*` });
-    await Promise.all(
-      tabs.map(async (tab) => {
-        if (typeof tab.id !== 'number') return;
+    const delivery = chrome.tabs
+      .query({ url: `${webAppOrigin}/*` })
+      .then(async (tabs) => {
+        await Promise.allSettled(
+          tabs.map(async (tab) => {
+            if (typeof tab.id !== 'number') return;
 
-        const tabUrl = tab.url || '';
-        if (!tabUrl.startsWith(`${webAppOrigin}/dashboard/${dashboardId}`)) {
-          return;
-        }
+            const tabUrl = tab.url || '';
+            if (
+              !tabUrl.startsWith(`${webAppOrigin}/dashboard/${dashboardId}`)
+            ) {
+              return;
+            }
 
-        await chrome.scripting.executeScript({
-          target: { tabId: tab.id },
-          world: 'MAIN',
-          func: () => {
-            setTimeout(() => {
-              window.dispatchEvent(new Event('jobstride:jobs-updated'));
-            }, 0);
-          },
-        });
+            await chrome.scripting.executeScript({
+              target: { tabId: tab.id },
+              world: 'MAIN',
+              func: () => {
+                window.dispatchEvent(new Event('jobstride:jobs-updated'));
+              },
+            });
+          }),
+        );
+      });
+
+    await Promise.race([
+      delivery,
+      new Promise<void>((resolve) => {
+        timeoutId = setTimeout(resolve, JOB_UPDATE_NOTIFICATION_TIMEOUT_MS);
       }),
-    );
-  } catch {}
+    ]);
+  } catch {
+  } finally {
+    if (timeoutId !== undefined) {
+      clearTimeout(timeoutId);
+    }
+  }
 }
 
 async function getApiErrorMessage(response: Response): Promise<string> {
